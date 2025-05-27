@@ -1,0 +1,72 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  accounts Account[]
+
+  @@map("users")
+}
+
+model Account {
+  id        String   @id @default(uuid())
+  name      String
+  balance   Decimal  @default(0)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  categories   Category[]
+  transactions Transaction[]
+
+  @@unique([userId, name])
+  @@map("accounts")
+}
+
+model Category {
+  id        String  @id @default(uuid())
+  name      String
+  accountId String
+  account   Account @relation(fields: [accountId], references: [id])
+
+  transactions Transaction[]
+
+  @@map("categories")
+}
+
+model Transaction {
+  id              String          @id @default(uuid())
+  accountId       String
+  categoryId      String?
+  amount          Decimal
+  transactionType TransactionType
+  description     String?
+  date            DateTime
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  account  Account   @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  category Category? @relation(fields: [categoryId], references: [id])
+
+  @@index([accountId], name: "idx_transactions_accountId")
+  @@index([categoryId], name: "idx_transactions_categoryId")
+  @@map("transactions")
+}
+
+enum TransactionType {
+  INCOME  @map("income")
+  EXPENSE @map("expense")
+}

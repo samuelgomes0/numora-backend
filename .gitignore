@@ -1,0 +1,25 @@
+# Node dependencies
+node_modules/
+
+# Build output
+build/
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Environment variables
+.env*
+
+# Logs
+*.log
+
+# Prisma generated files (optional, se não versiona)
+prisma/migrations/
+
+# IDE/editor configs
+.vscode/
+.idea/
+
+# OS system files
+.DS_Store
+Thumbs.db
