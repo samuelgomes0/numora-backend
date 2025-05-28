@@ -16,7 +16,7 @@ async function accountRoutes(server: FastifyInstance) {
   const paramsUserIdSchema = z.object({ userId: z.string().uuid() });
 
   // GET /accounts
-  server.get("/", async (request, reply) => {
+  server.get("/", async (_, reply) => {
     try {
       const accounts = await accountUseCase.findAll();
       return reply.send(accounts);

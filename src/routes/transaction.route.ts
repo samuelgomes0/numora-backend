@@ -15,7 +15,7 @@ async function transactionRoutes(server: FastifyInstance) {
   const paramsIdSchema = z.object({ id: z.string().uuid() });
 
   // GET /transactions
-  server.get("/", async (request, reply) => {
+  server.get("/", async (_, reply) => {
     try {
       const transactions = await transactionUseCase.findAll();
       return reply.send(transactions);

@@ -15,7 +15,7 @@ async function categoryRoutes(server: FastifyInstance) {
   const paramsIdSchema = z.object({ id: z.string().uuid() });
 
   // GET /categories
-  server.get("/", async (request, reply) => {
+  server.get("/", async (_, reply) => {
     try {
       const categories = await categoryUseCase.findAll();
       return reply.send(categories);
