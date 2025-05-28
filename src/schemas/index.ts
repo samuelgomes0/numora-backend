@@ -1,5 +1,21 @@
-import accountCreateSchema from "./accountCreate.schema";
-import transactionCreateSchema from "./transactionCreate.schema";
-import { createUserSchema } from "./user.schema";
+import { accountCreateSchema, accountUpdateSchema } from "./account.schema";
+import { categoryCreateSchema, categoryUpdateSchema } from "./category.schema";
+import { paramsEmailSchema, paramsIdSchema } from "./common.schema";
+import {
+  transactionCreateSchema,
+  transactionUpdateSchema,
+} from "./transaction.schema";
+import { createUserSchema, updateUserSchema } from "./user.schema";
 
-export { accountCreateSchema, createUserSchema, transactionCreateSchema };
+export {
+  accountCreateSchema,
+  accountUpdateSchema,
+  categoryCreateSchema,
+  categoryUpdateSchema,
+  createUserSchema,
+  paramsEmailSchema,
+  paramsIdSchema,
+  transactionCreateSchema,
+  transactionUpdateSchema,
+  updateUserSchema,
+};

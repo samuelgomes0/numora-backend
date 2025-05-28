@@ -1,4 +1,5 @@
 import fastify from "fastify";
+
 import routes from "./routes";
 
 const server = fastify();

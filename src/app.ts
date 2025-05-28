@@ -1,6 +1,6 @@
 import server from "./server";
 
-const PORT = Number(process.env.PORT) || 3333;
+const PORT = Number(process.env["PORT"]) || 3333;
 
 server.listen({ port: PORT, host: "0.0.0.0" }, (err, address) => {
   if (err) {

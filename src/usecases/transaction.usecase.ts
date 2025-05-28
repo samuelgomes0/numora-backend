@@ -1,50 +1,53 @@
-import { ITransaction, ITransactionPayload } from "../interfaces";
-import { TransactionRepository } from "../repositories";
+import {
+  ITransaction,
+  ITransactionCreatePayload,
+  ITransactionRepository,
+  ITransactionSummary,
+  ITransactionUpdatePayload,
+} from "@/interfaces";
 
-class TransactionUseCase implements TransactionRepository {
-  private readonly transactionRepository: TransactionRepository;
+class TransactionUseCase {
+  constructor(private readonly transactionRepository: ITransactionRepository) {}
 
-  constructor(transactionRepository: TransactionRepository) {
-    this.transactionRepository = transactionRepository;
+  findAll(): Promise<ITransactionSummary[]> {
+    return this.transactionRepository.findAll();
   }
 
-  async findAll(): Promise<ITransaction[]> {
-    const transactions = await this.transactionRepository.findAll();
-    return transactions;
+  findById(id: string): Promise<ITransaction | null> {
+    return this.transactionRepository.findById(id);
   }
 
-  async findById(id: string): Promise<ITransaction | null> {
-    const transaction = await this.transactionRepository.findById(id);
-    return transaction;
-  }
+  async create(data: ITransactionCreatePayload): Promise<ITransaction> {
+    if (data.amount <= 0) {
+      throw new Error("Amount must be greater than zero.");
+    }
+    // Opcional: validar se account existe
+    // const account = await this.transactionRepository.findAccountById(data.accountId);
+    // if (!account) throw new Error("Account does not exist.");
 
-  async create(data: ITransactionPayload): Promise<ITransaction> {
-    const { description, amount, date, transactionType, accountId } = data;
-
-    const newTransaction = await this.transactionRepository.create({
-      description,
-      amount,
-      date,
-      transactionType,
-      accountId,
-    });
-
-    return newTransaction;
+    return this.transactionRepository.create(data);
   }
 
   async update(
     id: string,
-    data: Partial<ITransactionPayload>
+    data: ITransactionUpdatePayload
   ): Promise<ITransaction> {
-    const updatedTransaction = await this.transactionRepository.update(
-      id,
-      data
-    );
-    return updatedTransaction;
+    const transaction = await this.transactionRepository.findById(id);
+    if (!transaction) {
+      throw new Error("Transaction not found.");
+    }
+    if (data.amount !== undefined && data.amount <= 0) {
+      throw new Error("Amount must be greater than zero.");
+    }
+    return this.transactionRepository.update(id, data);
   }
 
-  async delete(id: string): Promise<void> {
-    await this.transactionRepository.delete(id);
+  async delete(id: string): Promise<ITransaction | null> {
+    const transaction = await this.transactionRepository.findById(id);
+    if (!transaction) {
+      throw new Error("Transaction not found.");
+    }
+    return this.transactionRepository.delete(id);
   }
 }
 

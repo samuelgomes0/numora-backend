@@ -1,32 +1,63 @@
-import { prisma } from "../database/prisma-client";
+import { prisma } from "@/database/prisma-client";
 import {
   ITransaction,
-  ITransactionPayload,
+  ITransactionCreatePayload,
   ITransactionRepository,
-} from "../interfaces";
+  ITransactionSummary,
+  ITransactionUpdatePayload,
+} from "@/interfaces";
+
+const publicTransactionSelect = {
+  id: true,
+  amount: true,
+  transactionType: true,
+  date: true,
+};
+
+const privateTransactionSelect = {
+  id: true,
+  amount: true,
+  transactionType: true,
+  date: true,
+  description: true,
+  createdAt: true,
+  updatedAt: true,
+  accountId: true,
+  categoryId: true,
+};
 
 class TransactionRepository implements ITransactionRepository {
-  findAll(): Promise<ITransaction[]> {
-    return prisma.transaction.findMany();
+  findAll(): Promise<ITransactionSummary[]> {
+    return prisma.transaction.findMany({ select: publicTransactionSelect });
   }
 
   findById(id: string): Promise<ITransaction | null> {
-    return prisma.transaction.findUnique({ where: { id } });
-  }
-
-  create(data: ITransactionPayload): Promise<ITransaction> {
-    return prisma.transaction.create({ data: data });
-  }
-
-  update(id: string, data: Partial<ITransaction>): Promise<ITransaction> {
-    return prisma.transaction.update({
+    return prisma.transaction.findUnique({
       where: { id },
-      data: data,
+      select: privateTransactionSelect,
     });
   }
 
-  async delete(id: string): Promise<void> {
-    await prisma.transaction.delete({ where: { id } });
+  create(data: ITransactionCreatePayload): Promise<ITransaction> {
+    return prisma.transaction.create({
+      data,
+      select: privateTransactionSelect,
+    });
+  }
+
+  update(id: string, data: ITransactionUpdatePayload): Promise<ITransaction> {
+    return prisma.transaction.update({
+      where: { id },
+      data,
+      select: privateTransactionSelect,
+    });
+  }
+
+  delete(id: string): Promise<ITransaction | null> {
+    return prisma.transaction.delete({
+      where: { id },
+      select: privateTransactionSelect,
+    });
   }
 }
 

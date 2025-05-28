@@ -2,26 +2,53 @@ import { TransactionType } from "@prisma/client";
 
 interface ITransaction {
   id: string;
-  description: string | null;
   amount: number;
-  date: Date | string;
   transactionType: TransactionType;
+  description: string | null;
+  date: Date | string;
+  createdAt: Date | string;
+  updatedAt: Date | string;
+  accountId: string;
+  categoryId?: string | null;
 }
 
-interface ITransactionPayload {
-  description: string;
+interface ITransactionSummary {
+  id: string;
   amount: number;
-  date: Date | string;
   transactionType: TransactionType;
+  date: Date | string;
+}
+
+interface ITransactionCreatePayload {
+  amount: number;
+  transactionType: TransactionType;
+  description?: string | null;
+  date: Date | string;
   accountId: string;
+  categoryId?: string | null;
+}
+
+interface ITransactionUpdatePayload {
+  amount?: number;
+  transactionType?: TransactionType;
+  description?: string | null;
+  date?: Date | string;
+  accountId?: string;
+  categoryId?: string | null;
 }
 
 interface ITransactionRepository {
-  findAll(): Promise<ITransaction[]>;
+  findAll(): Promise<ITransactionSummary[]>;
   findById(id: string): Promise<ITransaction | null>;
-  create(data: ITransactionPayload): Promise<ITransaction>;
-  update(id: string, data: Partial<ITransactionPayload>): Promise<ITransaction>;
-  delete(id: string): Promise<void>;
+  create(data: ITransactionCreatePayload): Promise<ITransaction>;
+  update(id: string, data: ITransactionUpdatePayload): Promise<ITransaction>;
+  delete(id: string): Promise<ITransaction | null>;
 }
 
-export { ITransaction, ITransactionPayload, ITransactionRepository };
+export {
+  ITransaction,
+  ITransactionCreatePayload,
+  ITransactionRepository,
+  ITransactionSummary,
+  ITransactionUpdatePayload,
+};

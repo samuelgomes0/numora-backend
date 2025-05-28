@@ -1,52 +1,71 @@
-import { prisma } from "../database/prisma-client";
-import { IUser, IUserPayload, IUserRepository } from "../interfaces";
+import { prisma } from "@/database/prisma-client";
+import {
+  IUser,
+  IUserCreatePayload,
+  IUserRepository,
+  IUserSummary,
+  IUserUpdatePayload,
+} from "@/interfaces";
 
-const userSelect = {
+const publicUserSelect = {
   id: true,
   name: true,
   email: true,
   createdAt: true,
 };
+
+const privateUserSelect = {
+  ...publicUserSelect,
+  accounts: {
+    select: {
+      id: true,
+      name: true,
+      balance: true,
+    },
+  },
+};
+
 class UserRepository implements IUserRepository {
-  findAll(): Promise<IUser[]> {
+  findAll(): Promise<IUserSummary[]> {
     return prisma.user.findMany({
-      select: userSelect,
+      select: publicUserSelect,
     });
   }
 
   findById(id: string): Promise<IUser | null> {
     return prisma.user.findUnique({
       where: { id },
-      select: { ...userSelect, accounts: true },
+      select: privateUserSelect,
     });
   }
 
   findByEmail(email: string): Promise<IUser | null> {
     return prisma.user.findUnique({
       where: { email },
-      select: {
-        ...userSelect,
-        accounts: true,
-      },
+      select: privateUserSelect,
     });
   }
 
-  create(user: IUserPayload): Promise<IUser> {
+  create(user: IUserCreatePayload): Promise<IUser> {
     return prisma.user.create({
       data: user,
+      select: publicUserSelect,
     });
   }
 
-  update(id: string, user: IUserPayload): Promise<IUser> {
+  update(id: string, user: IUserUpdatePayload): Promise<IUser> {
     return prisma.user.update({
       where: { id },
       data: user,
+      select: publicUserSelect,
     });
   }
 
-  delete(id: string): boolean {
-    prisma.user.delete({ where: { id } });
-    return true;
+  delete(id: string): Promise<IUser | null> {
+    return prisma.user.delete({
+      where: { id },
+      select: publicUserSelect,
+    });
   }
 }
 

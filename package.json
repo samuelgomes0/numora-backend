@@ -1,16 +1,17 @@
 {
-  "name": "wise.wallet",
+  "name": "numora",
   "version": "1.0.0",
   "main": "src/app.ts",
-  "author": "Samuel Rosa",
-  "license": "ISC",
+  "author": "Samuel Gomes Rosa",
   "scripts": {
-    "dev": "nodemon --exec ts-node src/app.ts",
+    "dev": "tsx watch src/app.ts",
     "build": "tsc -p .",
     "start": "node build/app.js",
-    "test": "vitest",
-    "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev"
+    "lint": "eslint . --ext .ts",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:watch": "vitest watch"
   },
   "dependencies": {
     "@prisma/client": "^6.8.2",
@@ -20,13 +21,24 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
+    "@eslint/js": "^9.27.0",
+    "@eslint/json": "^0.12.0",
     "@types/node": "^22.13.1",
     "@types/supertest": "^6.0.3",
-    "nodemon": "^3.1.9",
+    "@typescript-eslint/eslint-plugin": "^8.33.0",
+    "@typescript-eslint/parser": "^8.33.0",
+    "eslint": "^9.27.0",
+    "eslint-config-prettier": "^10.1.5",
+    "eslint-plugin-prettier": "^5.4.0",
+    "globals": "^16.2.0",
+    "prettier": "^3.5.3",
     "prisma": "^6.8.2",
     "supertest": "^7.1.0",
     "ts-node": "^10.9.2",
+    "tsx": "^4.19.4",
     "typescript": "^5.7.3",
-    "vitest": "^3.1.1"
+    "typescript-eslint": "^8.33.0",
+    "vite-tsconfig-paths": "^5.1.4",
+    "vitest": "^3.1.4"
   }
 }

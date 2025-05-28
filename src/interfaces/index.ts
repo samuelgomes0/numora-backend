@@ -1,26 +1,60 @@
 import {
   IAccount,
-  IAccountCreate,
+  IAccountCreatePayload,
   IAccountRepository,
+  IAccountSummary,
+  IAccountUpdatePayload,
 } from "./account.interface";
-import { ICategory, ICategoryRepository } from "./category.interface";
+
+import {
+  ICategory,
+  ICategoryCreatePayload,
+  ICategoryRepository,
+  ICategorySummary,
+  ICategoryUpdatePayload,
+} from "./category.interface";
+
 import {
   ITransaction,
-  ITransactionPayload,
+  ITransactionCreatePayload,
   ITransactionRepository,
+  ITransactionSummary,
+  ITransactionUpdatePayload,
 } from "./transaction.interface";
-import { IUser, IUserPayload, IUserRepository } from "./user.interface";
+
+import {
+  IUser,
+  IAccountSummary as IUserAccountSummary,
+  IUserCreatePayload,
+  IUserRepository,
+  IUserSummary,
+  IUserUpdatePayload,
+} from "./user.interface";
 
 export {
+  // Account
   IAccount,
-  IAccountCreate,
+  IAccountCreatePayload,
   IAccountRepository,
+  IAccountSummary,
+  IAccountUpdatePayload,
+  // Category
   ICategory,
+  ICategoryCreatePayload,
   ICategoryRepository,
+  ICategorySummary,
+  ICategoryUpdatePayload,
+  // Transaction
   ITransaction,
-  ITransactionPayload,
+  ITransactionCreatePayload,
   ITransactionRepository,
+  ITransactionSummary,
+  ITransactionUpdatePayload,
+  // User
   IUser,
-  IUserPayload,
+  IUserAccountSummary,
+  IUserCreatePayload,
   IUserRepository,
+  IUserSummary,
+  IUserUpdatePayload,
 };
