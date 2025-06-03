@@ -1,4 +1,5 @@
 import { CategoryRepository } from "@/repositories";
+import { paramsIdSchema } from "@/schemas";
 import {
   categoryCreateSchema,
   categoryUpdateSchema,
@@ -11,8 +12,6 @@ import z from "zod";
 async function categoryRoutes(server: FastifyInstance) {
   const categoryRepository = new CategoryRepository();
   const categoryUseCase = new CategoryUseCase(categoryRepository);
-
-  const paramsIdSchema = z.object({ id: z.string().uuid() });
 
   // GET /categories
   server.get("/", async (_, reply) => {

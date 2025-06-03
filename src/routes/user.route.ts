@@ -1,12 +1,13 @@
 import { UserRepository } from "@/repositories";
-import { createUserSchema, updateUserSchema } from "@/schemas";
+import {
+  createUserSchema,
+  paramsEmailSchema,
+  paramsIdSchema,
+  updateUserSchema,
+} from "@/schemas";
 import { UserUseCase } from "@/usecases";
 
 import { FastifyInstance } from "fastify";
-import z from "zod";
-
-const paramsIdSchema = z.object({ id: z.string().uuid() });
-const paramsEmailSchema = z.object({ email: z.string().email() });
 
 async function userRoutes(server: FastifyInstance) {
   const userRepository = new UserRepository();

@@ -9,12 +9,11 @@ import {
 class TransactionUseCase {
   constructor(private readonly transactionRepository: ITransactionRepository) {}
 
-  findAll(): Promise<ITransactionSummary[]> {
-    return this.transactionRepository.findAll();
-  }
-
   findById(id: string): Promise<ITransaction | null> {
     return this.transactionRepository.findById(id);
+  }
+  findByAccount(accountId: string): Promise<ITransactionSummary[]> {
+    return this.transactionRepository.findByAccount(accountId);
   }
 
   async create(data: ITransactionCreatePayload): Promise<ITransaction> {

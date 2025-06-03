@@ -1,9 +1,22 @@
 import z from "zod";
 
-export const paramsIdSchema = z.object({
+const accountIdSchema = z.object({
+  accountId: z.string().uuid(),
+});
+
+const paramsEmailSchema = z.object({
+  email: z.string().email("Invalid email format"),
+});
+
+const paramsIdSchema = z.object({
   id: z.string().uuid("Invalid UUID"),
 });
 
-export const paramsEmailSchema = z.object({
-  email: z.string().email("Invalid email format"),
-});
+const paramsUserIdSchema = z.object({ userId: z.string().uuid() });
+
+export {
+  accountIdSchema,
+  paramsEmailSchema,
+  paramsIdSchema,
+  paramsUserIdSchema,
+};

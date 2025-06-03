@@ -1,4 +1,6 @@
 import { TransactionRepository } from "@/repositories";
+import { paramsIdSchema } from "@/schemas";
+import { accountIdSchema } from "@/schemas/common.schema";
 import {
   transactionCreateSchema,
   transactionUpdateSchema,
@@ -11,18 +13,6 @@ import z from "zod";
 async function transactionRoutes(server: FastifyInstance) {
   const transactionRepository = new TransactionRepository();
   const transactionUseCase = new TransactionUseCase(transactionRepository);
-
-  const paramsIdSchema = z.object({ id: z.string().uuid() });
-
-  // GET /transactions
-  server.get("/", async (_, reply) => {
-    try {
-      const transactions = await transactionUseCase.findAll();
-      return reply.send(transactions);
-    } catch {
-      return reply.status(500).send({ message: "Internal Server Error" });
-    }
-  });
 
   // GET /transactions/:id
   server.get("/:id", async (request, reply) => {
@@ -40,6 +30,27 @@ async function transactionRoutes(server: FastifyInstance) {
         return reply.status(404).send({ message: "Transaction not found" });
       }
       return reply.send(transaction);
+    } catch {
+      return reply.status(500).send({ message: "Internal Server Error" });
+    }
+  });
+
+  // GET /transactions/account/:accountId
+  server.get("/account/:accountId", async (request, reply) => {
+    const result = accountIdSchema.safeParse(request.params);
+
+    if (!result.success) {
+      return reply.status(400).send({
+        message: "Invalid account ID",
+        errors: result.error.errors,
+      });
+    }
+
+    try {
+      const transactions = await transactionUseCase.findByAccount(
+        result.data.accountId
+      );
+      return reply.send(transactions);
     } catch {
       return reply.status(500).send({ message: "Internal Server Error" });
     }

@@ -9,20 +9,24 @@ import {
 class AccountUseCase {
   constructor(private readonly accountRepository: IAccountRepository) {}
 
-  findAll(): Promise<IAccountSummary[]> {
-    return this.accountRepository.findAll();
-  }
-
   findById(id: string): Promise<IAccount | null> {
     return this.accountRepository.findById(id);
   }
 
-  findAccountsByUserId(userId: string): Promise<IAccountSummary[]> {
-    return this.accountRepository.findAccountsByUserId(userId);
+  findByUser(userId: string): Promise<IAccountSummary[]> {
+    return this.accountRepository.findByUser(userId);
+  }
+
+  async getBalance(id: string): Promise<number | null> {
+    const account = await this.accountRepository.findById(id);
+    if (!account) {
+      throw new Error("Account not found.");
+    }
+    return this.accountRepository.getBalance(id);
   }
 
   async create(data: IAccountCreatePayload): Promise<IAccount> {
-    const existingAccounts = await this.accountRepository.findAccountsByUserId(
+    const existingAccounts = await this.accountRepository.findByUser(
       data.userId
     );
     const nameExists = existingAccounts.some((acc) => acc.name === data.name);

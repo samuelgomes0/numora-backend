@@ -4,7 +4,7 @@ import routes from "./routes";
 
 const server = fastify();
 
-server.get("/", async (request, reply) => {
+server.get("/", async (_, reply) => {
   reply.send({ hello: "world" });
 });
 

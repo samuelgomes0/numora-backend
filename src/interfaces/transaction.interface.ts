@@ -38,8 +38,8 @@ interface ITransactionUpdatePayload {
 }
 
 interface ITransactionRepository {
-  findAll(): Promise<ITransactionSummary[]>;
   findById(id: string): Promise<ITransaction | null>;
+  findByAccount(accountId: string): Promise<ITransactionSummary[]>;
   create(data: ITransactionCreatePayload): Promise<ITransaction>;
   update(id: string, data: ITransactionUpdatePayload): Promise<ITransaction>;
   delete(id: string): Promise<ITransaction | null>;

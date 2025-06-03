@@ -7,17 +7,7 @@ import {
   IAccountUpdatePayload,
 } from "@/interfaces";
 
-const publicAccountSelect = {
-  id: true,
-  name: true,
-  balance: true,
-};
-
 class AccountRepository implements IAccountRepository {
-  findAll(): Promise<IAccountSummary[]> {
-    return prisma.account.findMany({ select: publicAccountSelect });
-  }
-
   findById(id: string): Promise<IAccount | null> {
     return prisma.account.findUnique({
       where: { id },
@@ -28,7 +18,7 @@ class AccountRepository implements IAccountRepository {
     });
   }
 
-  findAccountsByUserId(userId: string): Promise<IAccountSummary[]> {
+  findByUser(userId: string): Promise<IAccountSummary[]> {
     return prisma.account.findMany({
       where: { userId },
       select: {
@@ -37,6 +27,15 @@ class AccountRepository implements IAccountRepository {
         balance: true,
       },
     });
+  }
+
+  async getBalance(id: string): Promise<number | null> {
+    const account = await prisma.account.findUnique({
+      where: { id },
+      select: { balance: true },
+    });
+
+    return account ? account.balance : null;
   }
 
   create(data: IAccountCreatePayload): Promise<IAccount> {

@@ -3,7 +3,6 @@ import {
   ITransaction,
   ITransactionCreatePayload,
   ITransactionRepository,
-  ITransactionSummary,
   ITransactionUpdatePayload,
 } from "@/interfaces";
 
@@ -27,14 +26,16 @@ const privateTransactionSelect = {
 };
 
 class TransactionRepository implements ITransactionRepository {
-  findAll(): Promise<ITransactionSummary[]> {
-    return prisma.transaction.findMany({ select: publicTransactionSelect });
-  }
-
   findById(id: string): Promise<ITransaction | null> {
     return prisma.transaction.findUnique({
       where: { id },
       select: privateTransactionSelect,
+    });
+  }
+
+  findByAccount(accountId: string): Promise<ITransaction[]> {
+    return prisma.transaction.findMany({
+      where: { accountId },
     });
   }
 

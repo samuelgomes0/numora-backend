@@ -26,9 +26,9 @@ interface IAccountUpdatePayload {
 }
 
 interface IAccountRepository {
-  findAll(): Promise<IAccountSummary[]>;
   findById(id: string): Promise<IAccount | null>;
-  findAccountsByUserId(userId: string): Promise<IAccountSummary[]>;
+  findByUser(userId: string): Promise<IAccountSummary[]>;
+  getBalance(id: string): Promise<number | null>;
   create(data: IAccountCreatePayload): Promise<IAccount>;
   update(id: string, data: IAccountUpdatePayload): Promise<IAccount | null>;
   delete(id: string): Promise<IAccount | null>;

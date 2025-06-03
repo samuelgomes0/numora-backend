@@ -1,8 +1,10 @@
 import { AccountRepository } from "@/repositories";
+import { paramsIdSchema } from "@/schemas";
 import {
   accountCreateSchema,
   accountUpdateSchema,
 } from "@/schemas/account.schema";
+import { paramsUserIdSchema } from "@/schemas/common.schema";
 import { AccountUseCase } from "@/usecases";
 
 import { FastifyInstance } from "fastify";
@@ -11,19 +13,6 @@ import z from "zod";
 async function accountRoutes(server: FastifyInstance) {
   const accountRepository = new AccountRepository();
   const accountUseCase = new AccountUseCase(accountRepository);
-
-  const paramsIdSchema = z.object({ id: z.string().uuid() });
-  const paramsUserIdSchema = z.object({ userId: z.string().uuid() });
-
-  // GET /accounts
-  server.get("/", async (_, reply) => {
-    try {
-      const accounts = await accountUseCase.findAll();
-      return reply.send(accounts);
-    } catch {
-      return reply.code(500).send({ message: "Internal server error" });
-    }
-  });
 
   // GET /accounts/:id
   server.get("/:id", async (request, reply) => {
@@ -57,10 +46,29 @@ async function accountRoutes(server: FastifyInstance) {
     }
 
     try {
-      const accounts = await accountUseCase.findAccountsByUserId(
-        result.data.userId
-      );
+      const accounts = await accountUseCase.findByUser(result.data.userId);
       return reply.send(accounts);
+    } catch {
+      return reply.code(500).send({ message: "Internal server error" });
+    }
+  });
+
+  // GET /accounts/:id/balance
+  server.get("/:id/balance", async (request, reply) => {
+    const result = paramsIdSchema.safeParse(request.params);
+    if (!result.success) {
+      return reply.code(400).send({
+        message: "Invalid account ID",
+        errors: result.error.errors,
+      });
+    }
+
+    try {
+      const balance = await accountUseCase.getBalance(result.data.id);
+      if (balance === null) {
+        return reply.code(404).send({ message: "Account not found" });
+      }
+      return reply.send({ balance });
     } catch {
       return reply.code(500).send({ message: "Internal server error" });
     }
