@@ -7,39 +7,53 @@ import {
   ICategoryUpdatePayload,
 } from "@/interfaces";
 
-const publicCategorySelect = {
+const categorySelect = {
+  id: true,
+  name: true,
+  accountId: true,
+};
+
+const categorySummarySelect = {
   id: true,
   name: true,
 };
 
 class CategoryRepository implements ICategoryRepository {
-  findAll(): Promise<ICategorySummary[]> {
-    return prisma.category.findMany({ select: publicCategorySelect });
-  }
-
-  findById(id: string): Promise<ICategory | null> {
-    return prisma.category.findUnique({
-      where: { id },
+  async findAll(): Promise<ICategorySummary[]> {
+    return await prisma.category.findMany({
+      select: categorySummarySelect,
     });
   }
 
-  create(category: ICategoryCreatePayload): Promise<ICategory> {
-    return prisma.category.create({ data: category });
+  async findById(id: string): Promise<ICategory | null> {
+    return await prisma.category.findUnique({
+      where: { id },
+      select: categorySelect,
+    });
   }
 
-  update(
+  async create(data: ICategoryCreatePayload): Promise<ICategory> {
+    return await prisma.category.create({
+      data,
+      select: categorySelect,
+    });
+  }
+
+  async update(
     id: string,
-    category: ICategoryUpdatePayload
+    data: ICategoryUpdatePayload
   ): Promise<ICategory | null> {
-    return prisma.category.update({
+    return await prisma.category.update({
       where: { id },
-      data: category,
+      data,
+      select: categorySelect,
     });
   }
 
-  delete(id: string): Promise<ICategory | null> {
-    return prisma.category.delete({
+  async delete(id: string): Promise<ICategory | null> {
+    return await prisma.category.delete({
       where: { id },
+      select: categorySelect,
     });
   }
 }

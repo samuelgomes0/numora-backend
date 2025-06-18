@@ -40,8 +40,8 @@ describe("AccountUseCase", () => {
       .fn()
       .mockResolvedValue([{ id: "1", name: "Main", balance: 100 }]);
 
-    await expect(
-      accountUseCase.create({ userId: "u1", name: "Main" })
-    ).rejects.toThrow("Account name already exists for this user.");
+    await expect(accountUseCase.create({ userId: "u1", name: "Main" })).rejects.toThrow(
+      "Account name already exists for this user."
+    );
   });
 });

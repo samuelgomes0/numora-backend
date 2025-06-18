@@ -7,55 +7,59 @@ import {
 } from "@/interfaces";
 
 class AccountUseCase {
-  constructor(private readonly accountRepository: IAccountRepository) {}
-
-  findById(id: string): Promise<IAccount | null> {
-    return this.accountRepository.findById(id);
+  constructor(private readonly accountRepository: IAccountRepository) {
+    this.accountRepository = accountRepository;
   }
 
-  findByUser(userId: string): Promise<IAccountSummary[]> {
-    return this.accountRepository.findByUser(userId);
+  async findById(id: string): Promise<IAccount | null> {
+    return await this.accountRepository.findById(id);
   }
 
-  async getBalance(id: string): Promise<number | null> {
+  async findByUser(userId: string): Promise<IAccountSummary[]> {
+    return await this.accountRepository.findByUser(userId);
+  }
+
+  async getBalance(id: string): Promise<number> {
     const account = await this.accountRepository.findById(id);
     if (!account) {
-      throw new Error("Account not found.");
+      throw new Error("Conta não encontrada.");
     }
-    return this.accountRepository.getBalance(id);
+
+    // Se você já tem o balance no account, pode retornar diretamente:
+    return account.balance;
   }
 
   async create(data: IAccountCreatePayload): Promise<IAccount> {
-    const existingAccounts = await this.accountRepository.findByUser(
-      data.userId
-    );
-    const nameExists = existingAccounts.some((acc) => acc.name === data.name);
-    if (nameExists) {
-      throw new Error("Account name already exists for this user.");
+    const existing = await this.accountRepository.findByUser(data.userId);
+    const duplicate = existing.some((acc) => acc.name === data.name);
+
+    if (duplicate) {
+      throw new Error("Já existe uma conta com esse nome para este usuário.");
     }
-    return this.accountRepository.create(data);
+
+    return await this.accountRepository.create(data);
   }
 
-  async update(
-    id: string,
-    data: IAccountUpdatePayload
-  ): Promise<IAccount | null> {
+  async update(id: string, data: IAccountUpdatePayload): Promise<IAccount> {
     const account = await this.accountRepository.findById(id);
     if (!account) {
-      throw new Error("Account not found.");
+      throw new Error("Conta não encontrada.");
     }
-    return this.accountRepository.update(id, data);
+
+    return (await this.accountRepository.update(id, data)) as IAccount;
   }
 
-  async delete(id: string): Promise<IAccount | null> {
+  async delete(id: string): Promise<IAccount> {
     const account = await this.accountRepository.findById(id);
     if (!account) {
-      throw new Error("Account not found.");
+      throw new Error("Conta não encontrada.");
     }
-    if (account.transactions && account.transactions.length > 0) {
-      throw new Error("Cannot delete account with existing transactions.");
+
+    if ("transactions" in account && account.transactions?.length) {
+      throw new Error("Não é possível excluir uma conta com transações.");
     }
-    return this.accountRepository.delete(id);
+
+    return (await this.accountRepository.delete(id)) as IAccount;
   }
 }
 

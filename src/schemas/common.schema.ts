@@ -1,22 +1,29 @@
-import z from "zod";
+import { z } from "zod";
 
-const accountIdSchema = z.object({
-  accountId: z.string().uuid(),
+export const paramsIdSchema = z.object({
+  id: z.string().uuid("Invalid ID"),
 });
 
-const paramsEmailSchema = z.object({
-  email: z.string().email("Invalid email format"),
+export const userIdSchema = z.object({
+  userId: z.string().uuid("Invalid user ID"),
 });
 
-const paramsIdSchema = z.object({
-  id: z.string().uuid("Invalid UUID"),
+export const accountIdSchema = z.object({
+  accountId: z.string().uuid("Invalid account ID"),
 });
 
-const paramsUserIdSchema = z.object({ userId: z.string().uuid() });
+export const categoryIdSchema = z.object({
+  categoryId: z.string().uuid("Invalid category ID"),
+});
 
-export {
-  accountIdSchema,
-  paramsEmailSchema,
-  paramsIdSchema,
-  paramsUserIdSchema,
-};
+export const goalIdSchema = z.object({
+  goalId: z.string().uuid("Invalid goal ID"),
+});
+
+export const budgetIdSchema = z.object({
+  budgetId: z.string().uuid("Invalid budget ID"),
+});
+
+export const recurringTransactionIdSchema = z.object({
+  recurringTransactionId: z.string().uuid("Invalid recurring transaction ID"),
+});

@@ -21,11 +21,8 @@ interface ICategoryUpdatePayload {
 interface ICategoryRepository {
   findAll(): Promise<ICategorySummary[]>;
   findById(id: string): Promise<ICategory | null>;
-  create(category: ICategoryCreatePayload): Promise<ICategory>;
-  update(
-    id: string,
-    category: ICategoryUpdatePayload
-  ): Promise<ICategory | null>;
+  create(data: ICategoryCreatePayload): Promise<ICategory>;
+  update(id: string, data: ICategoryUpdatePayload): Promise<ICategory | null>;
   delete(id: string): Promise<ICategory | null>;
 }
 

@@ -7,15 +7,15 @@ import {
   IUserUpdatePayload,
 } from "@/interfaces";
 
-const publicUserSelect = {
+const userSummarySelect = {
   id: true,
   name: true,
   email: true,
   createdAt: true,
 };
 
-const privateUserSelect = {
-  ...publicUserSelect,
+const userSelect = {
+  ...userSummarySelect,
   accounts: {
     select: {
       id: true,
@@ -26,45 +26,45 @@ const privateUserSelect = {
 };
 
 class UserRepository implements IUserRepository {
-  findAll(): Promise<IUserSummary[]> {
-    return prisma.user.findMany({
-      select: publicUserSelect,
+  async findAll(): Promise<IUserSummary[]> {
+    return await prisma.user.findMany({
+      select: userSummarySelect,
     });
   }
 
-  findById(id: string): Promise<IUser | null> {
-    return prisma.user.findUnique({
+  async findById(id: string): Promise<IUser | null> {
+    return await prisma.user.findUnique({
       where: { id },
-      select: privateUserSelect,
+      select: userSelect,
     });
   }
 
-  findByEmail(email: string): Promise<IUser | null> {
-    return prisma.user.findUnique({
+  async findByEmail(email: string): Promise<IUser | null> {
+    return await prisma.user.findUnique({
       where: { email },
-      select: privateUserSelect,
+      select: userSelect,
     });
   }
 
-  create(user: IUserCreatePayload): Promise<IUser> {
-    return prisma.user.create({
-      data: user,
-      select: publicUserSelect,
+  async create(data: IUserCreatePayload): Promise<IUser> {
+    return await prisma.user.create({
+      data,
+      select: userSelect,
     });
   }
 
-  update(id: string, user: IUserUpdatePayload): Promise<IUser> {
-    return prisma.user.update({
+  async update(id: string, data: IUserUpdatePayload): Promise<IUser> {
+    return await prisma.user.update({
       where: { id },
-      data: user,
-      select: publicUserSelect,
+      data,
+      select: userSelect,
     });
   }
 
-  delete(id: string): Promise<IUser | null> {
-    return prisma.user.delete({
+  async delete(id: string): Promise<IUser | null> {
+    return await prisma.user.delete({
       where: { id },
-      select: publicUserSelect,
+      select: userSelect,
     });
   }
 }

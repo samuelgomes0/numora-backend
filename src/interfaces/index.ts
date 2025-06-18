@@ -31,6 +31,22 @@ import {
   IUserUpdatePayload,
 } from "./user.interface";
 
+import { IGoal, IGoalCreatePayload, IGoalRepository, IGoalUpdatePayload } from "./goal.interface";
+
+import {
+  IBudget,
+  IBudgetCreatePayload,
+  IBudgetRepository,
+  IBudgetUpdatePayload,
+} from "./budget.interface";
+
+import {
+  IRecurringTransaction,
+  IRecurringTransactionCreatePayload,
+  IRecurringTransactionRepository,
+  IRecurringTransactionUpdatePayload,
+} from "./recurringTransaction.interface";
+
 export {
   // Account
   IAccount,
@@ -38,12 +54,27 @@ export {
   IAccountRepository,
   IAccountSummary,
   IAccountUpdatePayload,
+  // Budget
+  IBudget,
+  IBudgetCreatePayload,
+  IBudgetRepository,
+  IBudgetUpdatePayload,
   // Category
   ICategory,
   ICategoryCreatePayload,
   ICategoryRepository,
   ICategorySummary,
   ICategoryUpdatePayload,
+  // Goal
+  IGoal,
+  IGoalCreatePayload,
+  IGoalRepository,
+  IGoalUpdatePayload,
+  // Recurring Transaction
+  IRecurringTransaction,
+  IRecurringTransactionCreatePayload,
+  IRecurringTransactionRepository,
+  IRecurringTransactionUpdatePayload,
   // Transaction
   ITransaction,
   ITransactionCreatePayload,

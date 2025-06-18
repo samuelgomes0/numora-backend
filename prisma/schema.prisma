@@ -16,6 +16,8 @@ model User {
   updatedAt DateTime @updatedAt
 
   accounts Account[]
+  goals    Goal[]
+  budgets  Budget[]
 
   @@map("users")
 }
@@ -25,24 +27,27 @@ model Account {
   name      String
   balance   Float    @default(0)
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  categories   Category[]
-  transactions Transaction[]
+  user                  User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  categories            Category[]
+  transactions          Transaction[]
+  recurringTransactions RecurringTransaction[]
 
   @@unique([userId, name])
   @@map("accounts")
 }
 
 model Category {
-  id        String  @id @default(uuid())
+  id        String @id @default(uuid())
   name      String
   accountId String
-  account   Account @relation(fields: [accountId], references: [id])
 
-  transactions Transaction[]
+  account               Account                @relation(fields: [accountId], references: [id])
+  transactions          Transaction[]
+  budgets               Budget[]
+  recurringTransactions RecurringTransaction[]
 
   @@map("categories")
 }
@@ -61,12 +66,71 @@ model Transaction {
   account  Account   @relation(fields: [accountId], references: [id], onDelete: Cascade)
   category Category? @relation(fields: [categoryId], references: [id])
 
-  @@index([accountId], name: "idx_transactions_accountId")
-  @@index([categoryId], name: "idx_transactions_categoryId")
+  @@index([accountId], name: "idx_transaction_account")
+  @@index([categoryId], name: "idx_transaction_category")
   @@map("transactions")
 }
 
+model Goal {
+  id           String    @id @default(uuid())
+  name         String
+  targetAmount Float
+  savedAmount  Float     @default(0)
+  deadline     DateTime?
+  userId       String
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("goals")
+}
+
+model Budget {
+  id         String   @id @default(uuid())
+  userId     String
+  categoryId String
+  month      Int
+  year       Int
+  limit      Float
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, categoryId, month, year], name: "unique_budget_per_period")
+  @@map("budgets")
+}
+
+model RecurringTransaction {
+  id              String          @id @default(uuid())
+  accountId       String
+  categoryId      String?
+  amount          Float
+  transactionType TransactionType
+  description     String?
+  startDate       DateTime
+  frequency       Frequency
+  endDate         DateTime?
+  lastRun         DateTime?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  account  Account   @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  category Category? @relation(fields: [categoryId], references: [id])
+
+  @@map("recurring_transactions")
+}
+
 enum TransactionType {
-  INCOME  @map("income")
   EXPENSE @map("expense")
+  INCOME  @map("income")
+}
+
+enum Frequency {
+  ANNUALLY @map("annually")
+  DAILY    @map("daily")
+  MONTHLY  @map("monthly")
+  WEEKLY   @map("weekly")
 }

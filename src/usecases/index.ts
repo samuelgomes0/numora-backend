@@ -1,6 +1,17 @@
 import AccountUseCase from "./account.usecase";
+import BudgetUseCase from "./budget.usecase";
 import CategoryUseCase from "./category.usecase";
+import GoalUseCase from "./goal.usecase";
+import RecurringTransactionUseCase from "./recurringTransaction.interface";
 import TransactionUseCase from "./transaction.usecase";
 import UserUseCase from "./user.usecase";
 
-export { AccountUseCase, CategoryUseCase, TransactionUseCase, UserUseCase };
+export {
+  AccountUseCase,
+  BudgetUseCase,
+  CategoryUseCase,
+  GoalUseCase,
+  RecurringTransactionUseCase,
+  TransactionUseCase,
+  UserUseCase,
+};

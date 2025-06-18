@@ -6,10 +6,11 @@ interface IUser {
   createdAt: Date;
 }
 
-interface IAccountSummary {
+interface IUserSummary {
   id: string;
   name: string;
-  balance: number;
+  email: string;
+  createdAt: Date;
 }
 
 interface IUserCreatePayload {
@@ -28,16 +29,15 @@ interface IUserRepository {
   findAll(): Promise<IUserSummary[]>;
   findById(id: string): Promise<IUser | null>;
   findByEmail(email: string): Promise<IUser | null>;
-  create(user: IUserCreatePayload): Promise<IUser>;
-  update(id: string, user: IUserUpdatePayload): Promise<IUser>;
+  create(data: IUserCreatePayload): Promise<IUser>;
+  update(id: string, data: IUserUpdatePayload): Promise<IUser>;
   delete(id: string): Promise<IUser | null>;
 }
 
-interface IUserSummary {
+interface IAccountSummary {
   id: string;
   name: string;
-  email: string;
-  createdAt: Date;
+  balance: number;
 }
 
 export {

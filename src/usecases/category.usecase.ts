@@ -7,38 +7,41 @@ import {
 } from "@/interfaces";
 
 class CategoryUseCase {
-  constructor(private readonly categoryRepository: ICategoryRepository) {}
-
-  findAll(): Promise<ICategorySummary[]> {
-    return this.categoryRepository.findAll();
+  constructor(private readonly categoryRepository: ICategoryRepository) {
+    this.categoryRepository = categoryRepository;
   }
 
-  findById(id: string): Promise<ICategory | null> {
-    return this.categoryRepository.findById(id);
+  async findAll(): Promise<ICategorySummary[]> {
+    return await this.categoryRepository.findAll();
   }
 
-  create(data: ICategoryCreatePayload): Promise<ICategory> {
-    return this.categoryRepository.create(data);
+  async findById(id: string): Promise<ICategory | null> {
+    return await this.categoryRepository.findById(id);
   }
 
-  async update(
-    id: string,
-    data: ICategoryUpdatePayload
-  ): Promise<ICategory | null> {
+  async create(data: ICategoryCreatePayload): Promise<ICategory> {
+    return await this.categoryRepository.create(data);
+  }
+
+  async update(id: string, data: ICategoryUpdatePayload): Promise<ICategory> {
     const category = await this.categoryRepository.findById(id);
     if (!category) {
-      throw new Error("Category not found.");
+      throw new Error("Categoria não encontrada.");
     }
-    return this.categoryRepository.update(id, data);
+
+    return (await this.categoryRepository.update(id, data)) as ICategory;
   }
 
-  async delete(id: string): Promise<ICategory | null> {
+  async delete(id: string): Promise<ICategory> {
     const category = await this.categoryRepository.findById(id);
     if (!category) {
-      throw new Error("Category not found.");
+      throw new Error("Categoria não encontrada.");
     }
-    // Opcional: validar se a categoria tem transações associadas
-    return this.categoryRepository.delete(id);
+
+    // Se desejar verificar se existem transações atreladas à categoria:
+    // Ex: if (await this.categoryRepository.hasTransactions(id)) { ... }
+
+    return (await this.categoryRepository.delete(id)) as ICategory;
   }
 }
 

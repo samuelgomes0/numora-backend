@@ -7,25 +7,33 @@ import {
   IAccountUpdatePayload,
 } from "@/interfaces";
 
+const accountSelect = {
+  id: true,
+  name: true,
+  balance: true,
+  userId: true,
+  createdAt: true,
+  updatedAt: true,
+};
+
+const accountSummarySelect = {
+  id: true,
+  name: true,
+  balance: true,
+};
+
 class AccountRepository implements IAccountRepository {
-  findById(id: string): Promise<IAccount | null> {
-    return prisma.account.findUnique({
+  async findById(id: string): Promise<IAccount | null> {
+    return await prisma.account.findUnique({
       where: { id },
-      include: {
-        transactions: true,
-        categories: true,
-      },
+      select: accountSelect,
     });
   }
 
-  findByUser(userId: string): Promise<IAccountSummary[]> {
-    return prisma.account.findMany({
+  async findByUser(userId: string): Promise<IAccountSummary[]> {
+    return await prisma.account.findMany({
       where: { userId },
-      select: {
-        id: true,
-        name: true,
-        balance: true,
-      },
+      select: accountSummarySelect,
     });
   }
 
@@ -35,27 +43,31 @@ class AccountRepository implements IAccountRepository {
       select: { balance: true },
     });
 
-    return account ? account.balance : null;
+    return account?.balance ?? null;
   }
 
-  create(data: IAccountCreatePayload): Promise<IAccount> {
-    return prisma.account.create({ data });
-  }
-
-  update(id: string, data: IAccountUpdatePayload): Promise<IAccount | null> {
-    return prisma.account.update({
-      where: { id },
+  async create(data: IAccountCreatePayload): Promise<IAccount> {
+    return await prisma.account.create({
       data,
-      include: {
-        transactions: true,
-        categories: true,
-      },
+      select: accountSelect,
     });
   }
 
-  delete(id: string): Promise<IAccount | null> {
-    return prisma.account.delete({
+  async update(
+    id: string,
+    data: IAccountUpdatePayload
+  ): Promise<IAccount | null> {
+    return await prisma.account.update({
       where: { id },
+      data,
+      select: accountSelect,
+    });
+  }
+
+  async delete(id: string): Promise<IAccount | null> {
+    return await prisma.account.delete({
+      where: { id },
+      select: accountSelect,
     });
   }
 }

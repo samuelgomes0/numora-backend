@@ -1,12 +1,7 @@
 import { TransactionRepository } from "@/repositories";
-import { paramsIdSchema } from "@/schemas";
+import { paramsIdSchema, transactionCreateSchema, transactionUpdateSchema } from "@/schemas";
 import { accountIdSchema } from "@/schemas/common.schema";
-import {
-  transactionCreateSchema,
-  transactionUpdateSchema,
-} from "@/schemas/transaction.schema";
 import { TransactionUseCase } from "@/usecases";
-
 import { FastifyInstance } from "fastify";
 import z from "zod";
 
@@ -14,57 +9,51 @@ async function transactionRoutes(server: FastifyInstance) {
   const transactionRepository = new TransactionRepository();
   const transactionUseCase = new TransactionUseCase(transactionRepository);
 
-  // GET /transactions/:id
+  const parseParams = <T>(schema: z.ZodSchema<T>, params: unknown, reply: any): T | null => {
+    const result = schema.safeParse(params);
+    if (!result.success) {
+      reply.status(400).send({
+        message: "Invalid parameters",
+        errors: result.error.errors,
+      });
+      return null;
+    }
+    return result.data;
+  };
+
   server.get("/:id", async (request, reply) => {
-    const result = paramsIdSchema.safeParse(request.params);
-    if (!result.success) {
-      return reply.status(400).send({
-        message: "Invalid transaction ID",
-        errors: result.error.errors,
-      });
-    }
+    const data = parseParams(paramsIdSchema, request.params, reply);
+    if (!data) return;
 
     try {
-      const transaction = await transactionUseCase.findById(result.data.id);
-      if (!transaction) {
-        return reply.status(404).send({ message: "Transaction not found" });
-      }
-      return reply.send(transaction);
+      const transaction = await transactionUseCase.findById(data.id);
+      if (!transaction) return reply.status(404).send({ message: "Transaction not found" });
+      reply.send(transaction);
     } catch {
-      return reply.status(500).send({ message: "Internal Server Error" });
+      reply.status(500).send({ message: "Internal server error" });
     }
   });
 
-  // GET /transactions/account/:accountId
   server.get("/account/:accountId", async (request, reply) => {
-    const result = accountIdSchema.safeParse(request.params);
-
-    if (!result.success) {
-      return reply.status(400).send({
-        message: "Invalid account ID",
-        errors: result.error.errors,
-      });
-    }
+    const data = parseParams(accountIdSchema, request.params, reply);
+    if (!data) return;
 
     try {
-      const transactions = await transactionUseCase.findByAccount(
-        result.data.accountId
-      );
-      return reply.send(transactions);
+      const transactions = await transactionUseCase.findByAccount(data.accountId);
+      reply.send(transactions);
     } catch {
-      return reply.status(500).send({ message: "Internal Server Error" });
+      reply.status(500).send({ message: "Internal server error" });
     }
   });
 
-  // POST /transactions
   server.post("/", async (request, reply) => {
     try {
-      const data = transactionCreateSchema.parse(request.body);
+      const body = transactionCreateSchema.parse(request.body);
       const transaction = await transactionUseCase.create({
-        ...data,
-        date: new Date(data.date),
+        ...body,
+        date: new Date(body.date),
       });
-      return reply.status(201).send(transaction);
+      reply.status(201).send(transaction);
     } catch (error) {
       if (error instanceof z.ZodError) {
         return reply.status(400).send({
@@ -72,27 +61,21 @@ async function transactionRoutes(server: FastifyInstance) {
           errors: error.errors,
         });
       }
-      return reply.status(500).send({ message: "Internal Server Error" });
+      reply.status(500).send({ message: "Internal server error" });
     }
   });
 
-  // PUT /transactions/:id
   server.put("/:id", async (request, reply) => {
-    const result = paramsIdSchema.safeParse(request.params);
-    if (!result.success) {
-      return reply.status(400).send({
-        message: "Invalid transaction ID",
-        errors: result.error.errors,
-      });
-    }
+    const data = parseParams(paramsIdSchema, request.params, reply);
+    if (!data) return;
 
     try {
-      const data = transactionUpdateSchema.parse(request.body);
-      const updatedTransaction = await transactionUseCase.update(
-        result.data.id,
-        { ...data, date: data.date ? new Date(data.date) : undefined }
-      );
-      return reply.send(updatedTransaction);
+      const body = transactionUpdateSchema.parse(request.body);
+      const updated = await transactionUseCase.update(data.id, {
+        ...body,
+        date: body.date ? new Date(body.date) : undefined,
+      });
+      reply.send(updated);
     } catch (error) {
       if (error instanceof z.ZodError) {
         return reply.status(400).send({
@@ -100,34 +83,20 @@ async function transactionRoutes(server: FastifyInstance) {
           errors: error.errors,
         });
       }
-      return reply.status(500).send({ message: "Internal Server Error" });
+      reply.status(500).send({ message: "Internal server error" });
     }
   });
 
-  // DELETE /transactions/:id
   server.delete("/:id", async (request, reply) => {
-    const result = paramsIdSchema.safeParse(request.params);
-    if (!result.success) {
-      return reply.status(400).send({
-        message: "Invalid transaction ID",
-        errors: result.error.errors,
-      });
-    }
+    const data = parseParams(paramsIdSchema, request.params, reply);
+    if (!data) return;
 
     try {
-      const deleted = await transactionUseCase.delete(result.data.id);
-      if (!deleted) {
-        return reply.status(404).send({ message: "Transaction not found" });
-      }
-      return reply.status(204).send();
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        return reply.status(400).send({
-          message: "Validation failed",
-          errors: error.errors,
-        });
-      }
-      return reply.status(500).send({ message: "Internal Server Error" });
+      const deleted = await transactionUseCase.delete(data.id);
+      if (!deleted) return reply.status(404).send({ message: "Transaction not found" });
+      reply.status(204).send();
+    } catch {
+      reply.status(500).send({ message: "Internal server error" });
     }
   });
 }

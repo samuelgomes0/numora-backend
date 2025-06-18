@@ -7,40 +7,49 @@ import {
 } from "@/interfaces";
 
 class UserUseCase {
-  constructor(private readonly userRepository: IUserRepository) {}
+  private readonly userRepository: IUserRepository;
 
-  findAll(): Promise<IUserSummary[]> {
-    return this.userRepository.findAll();
+  constructor(userRepository: IUserRepository) {
+    this.userRepository = userRepository;
   }
 
-  findById(id: string): Promise<IUser | null> {
-    return this.userRepository.findById(id);
+  async findAll(): Promise<IUserSummary[]> {
+    return await this.userRepository.findAll();
   }
 
-  findByEmail(email: string): Promise<IUser | null> {
-    return this.userRepository.findByEmail(email);
+  async findById(id: string): Promise<IUser | null> {
+    return await this.userRepository.findById(id);
   }
 
-  async create(user: IUserCreatePayload): Promise<IUser> {
-    const existingUser = await this.findByEmail(user.email);
+  async findByEmail(email: string): Promise<IUser | null> {
+    return await this.userRepository.findByEmail(email);
+  }
 
-    if (existingUser) {
-      throw new Error("Email already in use");
+  async create(data: IUserCreatePayload): Promise<IUser> {
+    const existing = await this.userRepository.findByEmail(data.email);
+    if (existing) {
+      throw new Error("E-mail já está em uso.");
     }
 
-    return this.userRepository.create(user);
+    return await this.userRepository.create(data);
   }
 
-  update(id: string, user: IUserUpdatePayload): Promise<IUser> {
-    return this.userRepository.update(id, user);
-  }
-
-  async delete(id: string): Promise<IUser | null> {
-    const user = await this.findById(id);
+  async update(id: string, data: IUserUpdatePayload): Promise<IUser> {
+    const user = await this.userRepository.findById(id);
     if (!user) {
-      throw new Error("User does not exist.");
+      throw new Error("Usuário não encontrado.");
     }
-    return this.userRepository.delete(id);
+
+    return await this.userRepository.update(id, data);
+  }
+
+  async delete(id: string): Promise<IUser> {
+    const user = await this.userRepository.findById(id);
+    if (!user) {
+      throw new Error("Usuário não encontrado.");
+    }
+
+    return (await this.userRepository.delete(id)) as IUser;
   }
 }
 

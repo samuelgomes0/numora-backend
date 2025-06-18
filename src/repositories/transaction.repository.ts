@@ -3,61 +3,63 @@ import {
   ITransaction,
   ITransactionCreatePayload,
   ITransactionRepository,
+  ITransactionSummary,
   ITransactionUpdatePayload,
 } from "@/interfaces";
 
-const publicTransactionSelect = {
+const transactionSelect = {
   id: true,
   amount: true,
   transactionType: true,
-  date: true,
-};
-
-const privateTransactionSelect = {
-  id: true,
-  amount: true,
-  transactionType: true,
-  date: true,
   description: true,
+  date: true,
   createdAt: true,
   updatedAt: true,
   accountId: true,
   categoryId: true,
 };
 
+const transactionSummarySelect = {
+  id: true,
+  amount: true,
+  transactionType: true,
+  date: true,
+};
+
 class TransactionRepository implements ITransactionRepository {
-  findById(id: string): Promise<ITransaction | null> {
-    return prisma.transaction.findUnique({
+  async findById(id: string): Promise<ITransaction | null> {
+    return await prisma.transaction.findUnique({
       where: { id },
-      select: privateTransactionSelect,
+      select: transactionSelect,
     });
   }
 
-  findByAccount(accountId: string): Promise<ITransaction[]> {
-    return prisma.transaction.findMany({
+  async findByAccount(accountId: string): Promise<ITransactionSummary[]> {
+    return await prisma.transaction.findMany({
       where: { accountId },
+      select: transactionSummarySelect,
     });
   }
 
-  create(data: ITransactionCreatePayload): Promise<ITransaction> {
-    return prisma.transaction.create({
+  async create(data: ITransactionCreatePayload): Promise<ITransaction> {
+    return await prisma.transaction.create({
       data,
-      select: privateTransactionSelect,
+      select: transactionSelect,
     });
   }
 
-  update(id: string, data: ITransactionUpdatePayload): Promise<ITransaction> {
-    return prisma.transaction.update({
+  async update(id: string, data: ITransactionUpdatePayload): Promise<ITransaction> {
+    return await prisma.transaction.update({
       where: { id },
       data,
-      select: privateTransactionSelect,
+      select: transactionSelect,
     });
   }
 
-  delete(id: string): Promise<ITransaction | null> {
-    return prisma.transaction.delete({
+  async delete(id: string): Promise<ITransaction | null> {
+    return await prisma.transaction.delete({
       where: { id },
-      select: privateTransactionSelect,
+      select: transactionSelect,
     });
   }
 }

@@ -24,9 +24,7 @@ describe("CategoryUseCase", () => {
   });
 
   it("should create category", async () => {
-    mockCategoryRepo.create = vi
-      .fn()
-      .mockResolvedValue({ id: "1", name: "Food" });
+    mockCategoryRepo.create = vi.fn().mockResolvedValue({ id: "1", name: "Food" });
 
     const category = await categoryUseCase.create({
       accountId: "a1",

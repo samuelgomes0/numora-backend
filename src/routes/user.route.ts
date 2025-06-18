@@ -1,121 +1,108 @@
 import { UserRepository } from "@/repositories";
-import {
-  createUserSchema,
-  paramsEmailSchema,
-  paramsIdSchema,
-  updateUserSchema,
-} from "@/schemas";
+import { createUserSchema, paramsEmailSchema, paramsIdSchema, updateUserSchema } from "@/schemas";
 import { UserUseCase } from "@/usecases";
-
 import { FastifyInstance } from "fastify";
+import z from "zod";
 
 async function userRoutes(server: FastifyInstance) {
   const userRepository = new UserRepository();
   const userUseCase = new UserUseCase(userRepository);
 
+  const parseParams = <T>(schema: z.ZodSchema<T>, params: unknown, reply: any): T | null => {
+    const result = schema.safeParse(params);
+    if (!result.success) {
+      reply.status(400).send({ message: "Invalid parameters", errors: result.error.errors });
+      return null;
+    }
+    return result.data;
+  };
+
   server.get("/", async (_, reply) => {
     try {
       const users = await userUseCase.findAll();
-      return reply.send(users);
+      reply.send(users);
     } catch {
-      return reply.code(500).send({ message: "Internal server error" });
+      reply.status(500).send({ message: "Internal server error" });
     }
   });
 
   server.get("/:id", async (request, reply) => {
-    const result = paramsIdSchema.safeParse(request.params);
-    if (!result.success) {
-      return reply.code(400).send({
-        message: "Invalid user ID",
-        errors: result.error.errors,
-      });
-    }
+    const data = parseParams(paramsIdSchema, request.params, reply);
+    if (!data) return;
+
     try {
-      const user = await userUseCase.findById(result.data.id);
-      if (!user) return reply.code(404).send({ message: "User not found" });
-      return reply.send(user);
+      const user = await userUseCase.findById(data.id);
+      if (!user) return reply.status(404).send({ message: "User not found" });
+      reply.send(user);
     } catch {
-      return reply.code(500).send({ message: "Internal server error" });
+      reply.status(500).send({ message: "Internal server error" });
     }
   });
 
   server.get("/email/:email", async (request, reply) => {
-    const result = paramsEmailSchema.safeParse(request.params);
-    if (!result.success) {
-      return reply.code(400).send({
-        message: "Invalid email",
-        errors: result.error.errors,
-      });
-    }
+    const data = parseParams(paramsEmailSchema, request.params, reply);
+    if (!data) return;
+
     try {
-      const user = await userUseCase.findByEmail(result.data.email);
-      if (!user) return reply.code(404).send({ message: "User not found" });
-      return reply.send(user);
+      const user = await userUseCase.findByEmail(data.email);
+      if (!user) return reply.status(404).send({ message: "User not found" });
+      reply.send(user);
     } catch {
-      return reply.code(500).send({ message: "Internal server error" });
+      reply.status(500).send({ message: "Internal server error" });
     }
   });
 
   server.post("/", async (request, reply) => {
     const result = createUserSchema.safeParse(request.body);
     if (!result.success) {
-      return reply.code(400).send({
+      return reply.status(400).send({
         message: "Validation failed",
         errors: result.error.errors,
       });
     }
+
     try {
       const user = await userUseCase.create(result.data);
-      return reply.code(201).send(user);
+      reply.status(201).send(user);
     } catch (error) {
-      return reply.code(500).send({
+      reply.status(500).send({
         message: error instanceof Error ? error.message : "Unexpected error",
       });
     }
   });
 
   server.put("/:id", async (request, reply) => {
-    const idResult = paramsIdSchema.safeParse(request.params);
-    if (!idResult.success) {
-      return reply.code(400).send({
-        message: "Invalid user ID",
-        errors: idResult.error.errors,
-      });
-    }
-    const bodyResult = updateUserSchema.safeParse(request.body);
-    if (!bodyResult.success) {
-      return reply.code(400).send({
+    const params = parseParams(paramsIdSchema, request.params, reply);
+    if (!params) return;
+
+    const body = updateUserSchema.safeParse(request.body);
+    if (!body.success) {
+      return reply.status(400).send({
         message: "Validation failed",
-        errors: bodyResult.error.errors,
+        errors: body.error.errors,
       });
     }
+
     try {
-      const updatedUser = await userUseCase.update(
-        idResult.data.id,
-        bodyResult.data
-      );
-      return reply.send(updatedUser);
+      const updatedUser = await userUseCase.update(params.id, body.data);
+      reply.send(updatedUser);
     } catch (error) {
-      return reply.code(500).send({
+      reply.status(500).send({
         message: error instanceof Error ? error.message : "Unexpected error",
       });
     }
   });
 
   server.delete("/:id", async (request, reply) => {
-    const result = paramsIdSchema.safeParse(request.params);
-    if (!result.success) {
-      return reply.code(400).send({
-        message: "Invalid user ID",
-        errors: result.error.errors,
-      });
-    }
+    const params = parseParams(paramsIdSchema, request.params, reply);
+    if (!params) return;
+
     try {
-      const deleted = await userUseCase.delete(result.data.id);
-      if (!deleted) return reply.code(404).send({ message: "User not found" });
-      return reply.code(204).send();
+      const deleted = await userUseCase.delete(params.id);
+      if (!deleted) return reply.status(404).send({ message: "User not found" });
+      reply.status(204).send();
     } catch (error) {
-      return reply.code(500).send({
+      reply.status(500).send({
         message: error instanceof Error ? error.message : "Unexpected error",
       });
     }
