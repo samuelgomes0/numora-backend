@@ -3,14 +3,12 @@ interface IUser {
   name: string;
   email: string;
   accounts?: IAccountSummary[];
-  createdAt: Date;
 }
 
 interface IUserSummary {
   id: string;
   name: string;
   email: string;
-  createdAt: Date;
 }
 
 interface IUserCreatePayload {

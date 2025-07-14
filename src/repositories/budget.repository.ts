@@ -8,13 +8,10 @@ import {
 
 const budgetSelect = {
   id: true,
-  userId: true,
   categoryId: true,
   month: true,
   year: true,
   limit: true,
-  createdAt: true,
-  updatedAt: true,
 };
 
 class BudgetRepository implements IBudgetRepository {

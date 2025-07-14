@@ -11,11 +11,12 @@ const userSummarySelect = {
   id: true,
   name: true,
   email: true,
-  createdAt: true,
 };
 
 const userSelect = {
-  ...userSummarySelect,
+  id: true,
+  name: true,
+  email: true,
   accounts: {
     select: {
       id: true,

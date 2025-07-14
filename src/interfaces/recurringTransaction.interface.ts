@@ -9,8 +9,6 @@ interface IRecurringTransaction {
   frequency: "DAILY" | "WEEKLY" | "MONTHLY" | "ANNUALLY";
   endDate?: Date | null;
   lastRun?: Date | null;
-  createdAt: Date;
-  updatedAt: Date;
 }
 
 interface IRecurringTransactionCreatePayload {

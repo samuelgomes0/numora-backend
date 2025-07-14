@@ -7,9 +7,6 @@ const goalSelect = {
   targetAmount: true,
   savedAmount: true,
   deadline: true,
-  userId: true,
-  createdAt: true,
-  updatedAt: true,
 };
 
 class GoalRepository implements IGoalRepository {

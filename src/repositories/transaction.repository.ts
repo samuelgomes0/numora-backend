@@ -13,8 +13,6 @@ const transactionSelect = {
   transactionType: true,
   description: true,
   date: true,
-  createdAt: true,
-  updatedAt: true,
   accountId: true,
   categoryId: true,
 };

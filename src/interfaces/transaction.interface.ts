@@ -6,8 +6,6 @@ interface ITransaction {
   transactionType: TransactionType;
   description: string | null;
   date: Date | string;
-  createdAt: Date | string;
-  updatedAt: Date | string;
   accountId: string;
   categoryId?: string | null;
 }

@@ -11,9 +11,6 @@ const accountSelect = {
   id: true,
   name: true,
   balance: true,
-  userId: true,
-  createdAt: true,
-  updatedAt: true,
 };
 
 const accountSummarySelect = {

@@ -14,7 +14,10 @@ async function recurringTransactionRoutes(server: FastifyInstance) {
   // GET /recurring-transactions/account/:accountId
   server.get("/account/:accountId", async (req, res) => {
     const parsed = accountIdSchema.safeParse(req.params);
-    if (!parsed.success) return res.code(400).send(parsed.error);
+    if (!parsed.success)
+      return res
+        .code(400)
+        .send({ message: "Invalid parameters", errors: parsed.error.errors });
 
     try {
       const transactions = await usecase.findByAccount(parsed.data.accountId);
@@ -31,28 +34,38 @@ async function recurringTransactionRoutes(server: FastifyInstance) {
       const transaction = await usecase.create(data);
       return res.code(201).send(transaction);
     } catch (error) {
-      return res.code(400).send(error);
+      return res.code(400).send({
+        message: error instanceof Error ? error.message : "Invalid request",
+      });
     }
   });
 
   // PUT /recurring-transactions/:id
   server.put("/:id", async (req, res) => {
     const parsed = paramsIdSchema.safeParse(req.params);
-    if (!parsed.success) return res.code(400).send(parsed.error);
+    if (!parsed.success)
+      return res
+        .code(400)
+        .send({ message: "Invalid parameters", errors: parsed.error.errors });
 
     try {
       const data = recurringTransactionUpdateSchema.parse(req.body);
       const updated = await usecase.update(parsed.data.id, data);
       return res.send(updated);
     } catch (error) {
-      return res.code(400).send(error);
+      return res.code(400).send({
+        message: error instanceof Error ? error.message : "Invalid request",
+      });
     }
   });
 
   // DELETE /recurring-transactions/:id
   server.delete("/:id", async (req, res) => {
     const parsed = paramsIdSchema.safeParse(req.params);
-    if (!parsed.success) return res.code(400).send(parsed.error);
+    if (!parsed.success)
+      return res
+        .code(400)
+        .send({ message: "Invalid parameters", errors: parsed.error.errors });
 
     try {
       await usecase.delete(parsed.data.id);
