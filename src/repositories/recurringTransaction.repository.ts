@@ -17,8 +17,6 @@ const recurringTransactionSelect = {
   frequency: true,
   endDate: true,
   lastRun: true,
-  createdAt: true,
-  updatedAt: true,
 };
 
 class RecurringTransactionRepository implements IRecurringTransactionRepository {

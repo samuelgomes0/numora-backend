@@ -10,7 +10,10 @@ async function goalRoutes(server: FastifyInstance) {
 
   server.get("/user/:userId", async (req, res) => {
     const parsed = userIdSchema.safeParse(req.params);
-    if (!parsed.success) return res.code(400).send(parsed.error);
+    if (!parsed.success)
+      return res
+        .code(400)
+        .send({ message: "Invalid parameters", errors: parsed.error.errors });
 
     try {
       const goals = await goalUseCase.findByUser(parsed.data.userId);
@@ -26,26 +29,36 @@ async function goalRoutes(server: FastifyInstance) {
       const goal = await goalUseCase.create(data);
       return res.code(201).send(goal);
     } catch (error) {
-      return res.code(400).send(error);
+      return res.code(400).send({
+        message: error instanceof Error ? error.message : "Invalid request",
+      });
     }
   });
 
   server.put("/:id", async (req, res) => {
     const parsed = paramsIdSchema.safeParse(req.params);
-    if (!parsed.success) return res.code(400).send(parsed.error);
+    if (!parsed.success)
+      return res
+        .code(400)
+        .send({ message: "Invalid parameters", errors: parsed.error.errors });
 
     try {
       const data = goalUpdateSchema.parse(req.body);
       const goal = await goalUseCase.update(parsed.data.id, data);
       return res.send(goal);
     } catch (error) {
-      return res.code(400).send(error);
+      return res.code(400).send({
+        message: error instanceof Error ? error.message : "Invalid request",
+      });
     }
   });
 
   server.delete("/:id", async (req, res) => {
     const parsed = paramsIdSchema.safeParse(req.params);
-    if (!parsed.success) return res.code(400).send(parsed.error);
+    if (!parsed.success)
+      return res
+        .code(400)
+        .send({ message: "Invalid parameters", errors: parsed.error.errors });
 
     try {
       await goalUseCase.delete(parsed.data.id);

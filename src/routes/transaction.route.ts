@@ -27,7 +27,8 @@ async function transactionRoutes(server: FastifyInstance) {
 
     try {
       const transaction = await transactionUseCase.findById(data.id);
-      if (!transaction) return reply.status(404).send({ message: "Transaction not found" });
+      if (!transaction)
+        return reply.status(404).send({ message: "Transaction not found" });
       reply.send(transaction);
     } catch {
       reply.status(500).send({ message: "Internal server error" });

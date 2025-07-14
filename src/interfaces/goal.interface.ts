@@ -4,9 +4,7 @@ interface IGoal {
   targetAmount: number;
   savedAmount: number;
   deadline: Date | null;
-  userId: string;
-  createdAt: Date;
-  updatedAt: Date;
+  userId?: string;
 }
 
 interface IGoalCreatePayload {
