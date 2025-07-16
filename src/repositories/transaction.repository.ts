@@ -7,7 +7,17 @@ import {
   ITransactionUpdatePayload,
 } from "@/interfaces";
 
-const transactionSelect = {
+// Para listagens - apenas dados essenciais
+const transactionSummarySelect = {
+  id: true,
+  amount: true,
+  transactionType: true,
+  description: true,
+  date: true,
+};
+
+// Para detalhes da transação - dados essenciais
+const transactionDetailSelect = {
   id: true,
   amount: true,
   transactionType: true,
@@ -17,18 +27,11 @@ const transactionSelect = {
   categoryId: true,
 };
 
-const transactionSummarySelect = {
-  id: true,
-  amount: true,
-  transactionType: true,
-  date: true,
-};
-
 class TransactionRepository implements ITransactionRepository {
   async findById(id: string): Promise<ITransaction | null> {
     return await prisma.transaction.findUnique({
       where: { id },
-      select: transactionSelect,
+      select: transactionDetailSelect,
     });
   }
 
@@ -36,6 +39,7 @@ class TransactionRepository implements ITransactionRepository {
     return await prisma.transaction.findMany({
       where: { accountId },
       select: transactionSummarySelect,
+      orderBy: { date: "desc" },
     });
   }
 
@@ -54,7 +58,7 @@ class TransactionRepository implements ITransactionRepository {
 
     return await prisma.transaction.create({
       data,
-      select: transactionSelect,
+      select: transactionDetailSelect,
     });
   }
 
@@ -65,15 +69,19 @@ class TransactionRepository implements ITransactionRepository {
     return await prisma.transaction.update({
       where: { id },
       data,
-      select: transactionSelect,
+      select: transactionDetailSelect,
     });
   }
 
   async delete(id: string): Promise<ITransaction | null> {
-    return await prisma.transaction.delete({
-      where: { id },
-      select: transactionSelect,
-    });
+    try {
+      return await prisma.transaction.delete({
+        where: { id },
+        select: transactionDetailSelect,
+      });
+    } catch (error) {
+      return null;
+    }
   }
 }
 

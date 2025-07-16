@@ -20,13 +20,11 @@ class AccountUseCase {
   }
 
   async getBalance(id: string): Promise<number> {
-    const account = await this.accountRepository.findById(id);
-    if (!account) {
+    const balance = await this.accountRepository.getBalance(id);
+    if (balance === null) {
       throw new Error("Conta não encontrada.");
     }
-
-    // Se você já tem o balance no account, pode retornar diretamente:
-    return account.balance;
+    return balance;
   }
 
   async create(data: IAccountCreatePayload): Promise<IAccount> {
@@ -53,10 +51,6 @@ class AccountUseCase {
     const account = await this.accountRepository.findById(id);
     if (!account) {
       throw new Error("Conta não encontrada.");
-    }
-
-    if ("transactions" in account && account.transactions?.length) {
-      throw new Error("Não é possível excluir uma conta com transações.");
     }
 
     return (await this.accountRepository.delete(id)) as IAccount;

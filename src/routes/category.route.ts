@@ -1,29 +1,13 @@
 import { CategoryRepository } from "@/repositories";
 import {
+  accountIdSchema,
   categoryCreateSchema,
   categoryUpdateSchema,
   paramsIdSchema,
 } from "@/schemas";
-import { accountIdSchema } from "@/schemas/common.schema";
 import { CategoryUseCase } from "@/usecases";
+import { parseParams } from "@/utils";
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
-import z from "zod";
-
-function parseParams<T>(
-  schema: z.ZodSchema<T>,
-  params: unknown,
-  reply: FastifyReply
-): T | null {
-  const result = schema.safeParse(params);
-  if (!result.success) {
-    reply.code(400).send({
-      message: "Parâmetros inválidos",
-      errors: result.error.errors,
-    });
-    return null;
-  }
-  return result.data;
-}
 
 async function categoryRoutes(server: FastifyInstance) {
   const categoryRepository = new CategoryRepository();

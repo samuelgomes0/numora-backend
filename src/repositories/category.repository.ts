@@ -7,22 +7,24 @@ import {
   ICategoryUpdatePayload,
 } from "@/interfaces";
 
-const categorySelect = {
-  id: true,
-  name: true,
-  accountId: true,
-};
-
+// Para listagens - apenas dados essenciais
 const categorySummarySelect = {
   id: true,
   name: true,
+};
+
+// Para detalhes da categoria - dados essenciais
+const categoryDetailSelect = {
+  id: true,
+  name: true,
+  accountId: true,
 };
 
 class CategoryRepository implements ICategoryRepository {
   async findById(id: string): Promise<ICategory | null> {
     return await prisma.category.findUnique({
       where: { id },
-      select: categorySelect,
+      select: categoryDetailSelect,
     });
   }
 
@@ -30,32 +32,34 @@ class CategoryRepository implements ICategoryRepository {
     return await prisma.category.findMany({
       where: { accountId },
       select: categorySummarySelect,
+      orderBy: { name: "asc" },
     });
   }
 
   async create(data: ICategoryCreatePayload): Promise<ICategory> {
     return await prisma.category.create({
       data,
-      select: categorySelect,
+      select: categoryDetailSelect,
     });
   }
 
-  async update(
-    id: string,
-    data: ICategoryUpdatePayload
-  ): Promise<ICategory | null> {
+  async update(id: string, data: ICategoryUpdatePayload): Promise<ICategory> {
     return await prisma.category.update({
       where: { id },
       data,
-      select: categorySelect,
+      select: categoryDetailSelect,
     });
   }
 
   async delete(id: string): Promise<ICategory | null> {
-    return await prisma.category.delete({
-      where: { id },
-      select: categorySelect,
-    });
+    try {
+      return await prisma.category.delete({
+        where: { id },
+        select: categoryDetailSelect,
+      });
+    } catch (error) {
+      return null;
+    }
   }
 }
 

@@ -14,6 +14,7 @@ interface ITransactionSummary {
   id: string;
   amount: number;
   transactionType: TransactionType;
+  description: string | null;
   date: Date | string;
 }
 

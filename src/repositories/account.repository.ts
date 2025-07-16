@@ -7,13 +7,15 @@ import {
   IAccountUpdatePayload,
 } from "@/interfaces";
 
-const accountSelect = {
+// Para listagens - apenas dados essenciais
+const accountSummarySelect = {
   id: true,
   name: true,
   balance: true,
 };
 
-const accountSummarySelect = {
+// Para detalhes da conta - dados essenciais sem informações internas
+const accountDetailSelect = {
   id: true,
   name: true,
   balance: true,
@@ -23,7 +25,7 @@ class AccountRepository implements IAccountRepository {
   async findById(id: string): Promise<IAccount | null> {
     return await prisma.account.findUnique({
       where: { id },
-      select: accountSelect,
+      select: accountDetailSelect,
     });
   }
 
@@ -46,26 +48,27 @@ class AccountRepository implements IAccountRepository {
   async create(data: IAccountCreatePayload): Promise<IAccount> {
     return await prisma.account.create({
       data,
-      select: accountSelect,
+      select: accountDetailSelect,
     });
   }
 
-  async update(
-    id: string,
-    data: IAccountUpdatePayload
-  ): Promise<IAccount | null> {
+  async update(id: string, data: IAccountUpdatePayload): Promise<IAccount> {
     return await prisma.account.update({
       where: { id },
       data,
-      select: accountSelect,
+      select: accountDetailSelect,
     });
   }
 
   async delete(id: string): Promise<IAccount | null> {
-    return await prisma.account.delete({
-      where: { id },
-      select: accountSelect,
-    });
+    try {
+      return await prisma.account.delete({
+        where: { id },
+        select: accountDetailSelect,
+      });
+    } catch (error) {
+      return null;
+    }
   }
 }
 

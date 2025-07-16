@@ -30,9 +30,15 @@ interface IRecurringTransactionUpdatePayload {
 }
 
 interface IRecurringTransactionRepository {
+  findById(id: string): Promise<IRecurringTransaction | null>;
   findByAccount(accountId: string): Promise<IRecurringTransaction[]>;
-  create(data: IRecurringTransactionCreatePayload): Promise<IRecurringTransaction>;
-  update(id: string, data: IRecurringTransactionUpdatePayload): Promise<IRecurringTransaction>;
+  create(
+    data: IRecurringTransactionCreatePayload
+  ): Promise<IRecurringTransaction>;
+  update(
+    id: string,
+    data: IRecurringTransactionUpdatePayload
+  ): Promise<IRecurringTransaction>;
   delete(id: string): Promise<IRecurringTransaction | null>;
 }
 

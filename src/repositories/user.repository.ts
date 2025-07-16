@@ -7,13 +7,15 @@ import {
   IUserUpdatePayload,
 } from "@/interfaces";
 
+// Para listagens públicas - apenas dados básicos
 const userSummarySelect = {
   id: true,
   name: true,
   email: true,
 };
 
-const userSelect = {
+// Para detalhes do usuário - dados essenciais sem informações sensíveis
+const userDetailSelect = {
   id: true,
   name: true,
   email: true,
@@ -36,21 +38,21 @@ class UserRepository implements IUserRepository {
   async findById(id: string): Promise<IUser | null> {
     return await prisma.user.findUnique({
       where: { id },
-      select: userSelect,
+      select: userDetailSelect,
     });
   }
 
   async findByEmail(email: string): Promise<IUser | null> {
     return await prisma.user.findUnique({
       where: { email },
-      select: userSelect,
+      select: userDetailSelect,
     });
   }
 
   async create(data: IUserCreatePayload): Promise<IUser> {
     return await prisma.user.create({
       data,
-      select: userSelect,
+      select: userDetailSelect,
     });
   }
 
@@ -58,15 +60,19 @@ class UserRepository implements IUserRepository {
     return await prisma.user.update({
       where: { id },
       data,
-      select: userSelect,
+      select: userDetailSelect,
     });
   }
 
   async delete(id: string): Promise<IUser | null> {
-    return await prisma.user.delete({
-      where: { id },
-      select: userSelect,
-    });
+    try {
+      return await prisma.user.delete({
+        where: { id },
+        select: userDetailSelect,
+      });
+    } catch (error) {
+      return null;
+    }
   }
 }
 

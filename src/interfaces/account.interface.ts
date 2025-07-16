@@ -1,12 +1,7 @@
-import { ICategorySummary } from "./category.interface";
-import { ITransactionSummary } from "./transaction.interface";
-
 interface IAccount {
   id: string;
   name: string;
   balance: number;
-  transactions?: ITransactionSummary[];
-  categories?: ICategorySummary[];
 }
 
 interface IAccountSummary {
@@ -29,7 +24,7 @@ interface IAccountRepository {
   findByUser(userId: string): Promise<IAccountSummary[]>;
   getBalance(id: string): Promise<number | null>;
   create(data: IAccountCreatePayload): Promise<IAccount>;
-  update(id: string, data: IAccountUpdatePayload): Promise<IAccount | null>;
+  update(id: string, data: IAccountUpdatePayload): Promise<IAccount>;
   delete(id: string): Promise<IAccount | null>;
 }
 

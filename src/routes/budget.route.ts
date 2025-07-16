@@ -1,29 +1,13 @@
 import { BudgetRepository } from "@/repositories";
-import { paramsIdSchema } from "@/schemas";
 import {
   budgetCreateSchema,
   budgetUpdateSchema,
-} from "@/schemas/budget.schema";
-import { userIdSchema } from "@/schemas/common.schema";
+  paramsIdSchema,
+  userIdSchema,
+} from "@/schemas";
 import { BudgetUseCase } from "@/usecases";
+import { parseParams } from "@/utils";
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
-import z from "zod";
-
-function parseParams<T>(
-  schema: z.ZodSchema<T>,
-  params: unknown,
-  reply: FastifyReply
-): T | null {
-  const result = schema.safeParse(params);
-  if (!result.success) {
-    reply.code(400).send({
-      message: "Parâmetros inválidos",
-      errors: result.error.errors,
-    });
-    return null;
-  }
-  return result.data;
-}
 
 async function budgetRoutes(server: FastifyInstance) {
   const budgetRepository = new BudgetRepository();

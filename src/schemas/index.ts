@@ -1,7 +1,16 @@
 import { accountCreateSchema, accountUpdateSchema } from "./account.schema";
 import { budgetCreateSchema, budgetUpdateSchema } from "./budget.schema";
 import { categoryCreateSchema, categoryUpdateSchema } from "./category.schema";
-import { paramsEmailSchema, paramsIdSchema } from "./common.schema";
+import {
+  accountIdSchema,
+  budgetIdSchema,
+  categoryIdSchema,
+  goalIdSchema,
+  paramsEmailSchema,
+  paramsIdSchema,
+  recurringTransactionIdSchema,
+  userIdSchema,
+} from "./common.schema";
 import { goalCreateSchema, goalUpdateSchema } from "./goal.schema";
 import {
   recurringTransactionCreateSchema,
@@ -15,19 +24,25 @@ import { createUserSchema, updateUserSchema } from "./user.schema";
 
 export {
   accountCreateSchema,
+  accountIdSchema,
   accountUpdateSchema,
   budgetCreateSchema,
+  budgetIdSchema,
   budgetUpdateSchema,
   categoryCreateSchema,
+  categoryIdSchema,
   categoryUpdateSchema,
   createUserSchema,
   goalCreateSchema,
+  goalIdSchema,
   goalUpdateSchema,
   paramsEmailSchema,
   paramsIdSchema,
   recurringTransactionCreateSchema,
+  recurringTransactionIdSchema,
   recurringTransactionUpdateSchema,
   transactionCreateSchema,
   transactionUpdateSchema,
   updateUserSchema,
+  userIdSchema,
 };

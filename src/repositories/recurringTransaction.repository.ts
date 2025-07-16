@@ -6,7 +6,8 @@ import {
   IRecurringTransactionUpdatePayload,
 } from "@/interfaces";
 
-const recurringTransactionSelect = {
+// Para listagens - apenas dados essenciais
+const recurringTransactionSummarySelect = {
   id: true,
   accountId: true,
   categoryId: true,
@@ -19,37 +20,67 @@ const recurringTransactionSelect = {
   lastRun: true,
 };
 
-class RecurringTransactionRepository implements IRecurringTransactionRepository {
-  async findByAccount(accountId: string): Promise<IRecurringTransaction[]> {
-    return await prisma.recurringTransaction.findMany({
-      where: { accountId },
-      select: recurringTransactionSelect,
+// Para detalhes da transação recorrente - dados essenciais
+const recurringTransactionDetailSelect = {
+  id: true,
+  accountId: true,
+  categoryId: true,
+  amount: true,
+  transactionType: true,
+  description: true,
+  startDate: true,
+  frequency: true,
+  endDate: true,
+  lastRun: true,
+};
+
+class RecurringTransactionRepository
+  implements IRecurringTransactionRepository
+{
+  async findById(id: string): Promise<IRecurringTransaction | null> {
+    return await prisma.recurringTransaction.findUnique({
+      where: { id },
+      select: recurringTransactionDetailSelect,
     });
   }
 
-  async create(data: IRecurringTransactionCreatePayload): Promise<IRecurringTransaction> {
+  async findByAccount(accountId: string): Promise<IRecurringTransaction[]> {
+    return await prisma.recurringTransaction.findMany({
+      where: { accountId },
+      select: recurringTransactionSummarySelect,
+      orderBy: { startDate: "desc" },
+    });
+  }
+
+  async create(
+    data: IRecurringTransactionCreatePayload
+  ): Promise<IRecurringTransaction> {
     return await prisma.recurringTransaction.create({
       data,
-      select: recurringTransactionSelect,
+      select: recurringTransactionDetailSelect,
     });
   }
 
   async update(
     id: string,
-    data: IRecurringTransactionUpdatePayload,
+    data: IRecurringTransactionUpdatePayload
   ): Promise<IRecurringTransaction> {
     return await prisma.recurringTransaction.update({
       where: { id },
       data,
-      select: recurringTransactionSelect,
+      select: recurringTransactionDetailSelect,
     });
   }
 
   async delete(id: string): Promise<IRecurringTransaction | null> {
-    return await prisma.recurringTransaction.delete({
-      where: { id },
-      select: recurringTransactionSelect,
-    });
+    try {
+      return await prisma.recurringTransaction.delete({
+        where: { id },
+        select: recurringTransactionDetailSelect,
+      });
+    } catch (error) {
+      return null;
+    }
   }
 }
 

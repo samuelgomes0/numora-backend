@@ -13,7 +13,7 @@ async function routes(server: FastifyInstance) {
   server.register(categoryRoutes, { prefix: "/categories" });
   server.register(goalRoutes, { prefix: "/goals" });
   server.register(recurringTransactionRoutes, {
-    prefix: "/recurringTransaction",
+    prefix: "/recurring-transactions",
   });
   server.register(transactionRoutes, { prefix: "/transactions" });
   server.register(userRoutes, { prefix: "/users" });
