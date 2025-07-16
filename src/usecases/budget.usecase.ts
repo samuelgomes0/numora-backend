@@ -15,16 +15,33 @@ class BudgetUseCase {
   }
 
   async create(data: IBudgetCreatePayload): Promise<IBudget> {
+    if (data.limit <= 0) {
+      throw new Error("O limite do orçamento deve ser maior que zero.");
+    }
+
     return await this.budgetRepository.create(data);
   }
 
   async update(id: string, data: IBudgetUpdatePayload): Promise<IBudget> {
-    // Como não há `findById`, pode-se presumir existência ou adaptar
-    return await this.budgetRepository.update(id, data);
+    if (data.limit !== undefined && data.limit <= 0) {
+      throw new Error("O limite do orçamento deve ser maior que zero.");
+    }
+
+    const updatedBudget = await this.budgetRepository.update(id, data);
+    if (!updatedBudget) {
+      throw new Error("Orçamento não encontrado.");
+    }
+
+    return updatedBudget;
   }
 
   async delete(id: string): Promise<IBudget> {
-    return (await this.budgetRepository.delete(id)) as IBudget;
+    const deletedBudget = await this.budgetRepository.delete(id);
+    if (!deletedBudget) {
+      throw new Error("Orçamento não encontrado.");
+    }
+
+    return deletedBudget;
   }
 }
 

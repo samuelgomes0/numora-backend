@@ -11,12 +11,12 @@ class CategoryUseCase {
     this.categoryRepository = categoryRepository;
   }
 
-  async findAll(): Promise<ICategorySummary[]> {
-    return await this.categoryRepository.findAll();
-  }
-
   async findById(id: string): Promise<ICategory | null> {
     return await this.categoryRepository.findById(id);
+  }
+
+  async findByAccount(accountId: string): Promise<ICategorySummary[]> {
+    return await this.categoryRepository.findByAccount(accountId);
   }
 
   async create(data: ICategoryCreatePayload): Promise<ICategory> {

@@ -4,6 +4,10 @@ export const paramsIdSchema = z.object({
   id: z.string().uuid("Invalid ID"),
 });
 
+export const paramsEmailSchema = z.object({
+  email: z.string().email("Invalid email format"),
+});
+
 export const userIdSchema = z.object({
   userId: z.string().uuid("Invalid user ID"),
 });

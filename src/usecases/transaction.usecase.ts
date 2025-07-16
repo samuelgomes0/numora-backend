@@ -27,7 +27,10 @@ class TransactionUseCase {
     return await this.transactionRepository.create(data);
   }
 
-  async update(id: string, data: ITransactionUpdatePayload): Promise<ITransaction> {
+  async update(
+    id: string,
+    data: ITransactionUpdatePayload
+  ): Promise<ITransaction> {
     const transaction = await this.transactionRepository.findById(id);
     if (!transaction) {
       throw new Error("Transação não encontrada.");

@@ -1,4 +1,9 @@
-import { IGoal, IGoalCreatePayload, IGoalRepository, IGoalUpdatePayload } from "@/interfaces";
+import {
+  IGoal,
+  IGoalCreatePayload,
+  IGoalRepository,
+  IGoalUpdatePayload,
+} from "@/interfaces";
 
 class GoalUseCase {
   constructor(private readonly goalRepository: IGoalRepository) {
@@ -14,6 +19,10 @@ class GoalUseCase {
   }
 
   async create(data: IGoalCreatePayload): Promise<IGoal> {
+    if (data.targetAmount <= 0) {
+      throw new Error("O valor alvo deve ser maior que zero.");
+    }
+
     return await this.goalRepository.create(data);
   }
 
@@ -23,7 +32,16 @@ class GoalUseCase {
       throw new Error("Meta não encontrada.");
     }
 
-    return await this.goalRepository.update(id, data);
+    if (data.targetAmount !== undefined && data.targetAmount <= 0) {
+      throw new Error("O valor alvo deve ser maior que zero.");
+    }
+
+    const updatedGoal = await this.goalRepository.update(id, data);
+    if (!updatedGoal) {
+      throw new Error("Meta não encontrada.");
+    }
+
+    return updatedGoal;
   }
 
   async delete(id: string): Promise<IGoal> {
@@ -32,7 +50,12 @@ class GoalUseCase {
       throw new Error("Meta não encontrada.");
     }
 
-    return (await this.goalRepository.delete(id)) as IGoal;
+    const deletedGoal = await this.goalRepository.delete(id);
+    if (!deletedGoal) {
+      throw new Error("Meta não encontrada.");
+    }
+
+    return deletedGoal;
   }
 }
 

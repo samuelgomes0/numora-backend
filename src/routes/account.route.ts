@@ -1,115 +1,143 @@
 import { AccountRepository } from "@/repositories";
-import { accountCreateSchema, accountUpdateSchema, paramsIdSchema } from "@/schemas";
+import {
+  accountCreateSchema,
+  accountUpdateSchema,
+  paramsIdSchema,
+} from "@/schemas";
 import { userIdSchema } from "@/schemas/common.schema";
 import { AccountUseCase } from "@/usecases";
-import { FastifyInstance } from "fastify";
+import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import z from "zod";
+
+function parseParams<T>(
+  schema: z.ZodSchema<T>,
+  params: unknown,
+  reply: FastifyReply
+): T | null {
+  const result = schema.safeParse(params);
+  if (!result.success) {
+    reply.code(400).send({
+      message: "Parâmetros inválidos",
+      errors: result.error.errors,
+    });
+    return null;
+  }
+  return result.data;
+}
 
 async function accountRoutes(server: FastifyInstance) {
   const accountRepository = new AccountRepository();
   const accountUseCase = new AccountUseCase(accountRepository);
 
-  function parseParams<T>(schema: z.ZodSchema<T>, params: unknown, reply: any): T | null {
-    const result = schema.safeParse(params);
-    if (!result.success) {
-      reply.code(400).send({
-        message: "Invalid parameters",
-        errors: result.error.errors,
-      });
-      return null;
-    }
-    return result.data;
-  }
-
-  server.get("/:id", async (request, reply) => {
-    const data = parseParams(paramsIdSchema, request.params, reply);
-    if (!data) return;
+  server.get("/:id", async (request: FastifyRequest, reply: FastifyReply) => {
+    const params = parseParams(paramsIdSchema, request.params, reply);
+    if (!params) return;
 
     try {
-      const account = await accountUseCase.findById(data.id);
-      if (!account) return reply.code(404).send({ message: "Account not found" });
+      const account = await accountUseCase.findById(params.id);
+      if (!account)
+        return reply.code(404).send({ message: "Conta não encontrada" });
       reply.send(account);
     } catch {
-      reply.code(500).send({ message: "Internal server error" });
+      reply.code(500).send({ message: "Erro interno do servidor" });
     }
   });
 
-  server.get("/user/:userId", async (request, reply) => {
-    const data = parseParams(userIdSchema, request.params, reply);
-    if (!data) return;
+  server.get(
+    "/user/:userId",
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const params = parseParams(userIdSchema, request.params, reply);
+      if (!params) return;
 
-    try {
-      const accounts = await accountUseCase.findByUser(data.userId);
-      reply.send(accounts);
-    } catch {
-      reply.code(500).send({ message: "Internal server error" });
+      try {
+        const accounts = await accountUseCase.findByUser(params.userId);
+        reply.send(accounts);
+      } catch {
+        reply.code(500).send({ message: "Erro interno do servidor" });
+      }
     }
-  });
+  );
 
-  server.get("/:id/balance", async (request, reply) => {
-    const data = parseParams(paramsIdSchema, request.params, reply);
-    if (!data) return;
+  server.get(
+    "/:id/balance",
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const params = parseParams(paramsIdSchema, request.params, reply);
+      if (!params) return;
 
-    try {
-      const balance = await accountUseCase.getBalance(data.id);
-      if (balance === null) return reply.code(404).send({ message: "Account not found" });
-      reply.send({ balance });
-    } catch {
-      reply.code(500).send({ message: "Internal server error" });
+      try {
+        const balance = await accountUseCase.getBalance(params.id);
+        if (balance === null)
+          return reply.code(404).send({ message: "Conta não encontrada" });
+        reply.send({ balance });
+      } catch {
+        reply.code(500).send({ message: "Erro interno do servidor" });
+      }
     }
-  });
+  );
 
-  server.post("/", async (request, reply) => {
+  server.post("/", async (request: FastifyRequest, reply: FastifyReply) => {
+    const result = accountCreateSchema.safeParse(request.body);
+    if (!result.success) {
+      reply.code(400).send({
+        message: "Falha de validação",
+        errors: result.error.errors,
+      });
+      return;
+    }
+
     try {
-      const body = accountCreateSchema.parse(request.body);
-      const account = await accountUseCase.create(body);
+      const account = await accountUseCase.create(result.data);
       reply.code(201).send(account);
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        return reply.code(400).send({ message: "Validation failed", errors: error.errors });
-      }
       reply.code(500).send({
-        message: error instanceof Error ? error.message : "Internal server error",
+        message: error instanceof Error ? error.message : "Erro inesperado",
       });
     }
   });
 
-  server.put("/:id", async (request, reply) => {
-    const data = parseParams(paramsIdSchema, request.params, reply);
-    if (!data) return;
+  server.put("/:id", async (request: FastifyRequest, reply: FastifyReply) => {
+    const params = parseParams(paramsIdSchema, request.params, reply);
+    if (!params) return;
+
+    const body = accountUpdateSchema.safeParse(request.body);
+    if (!body.success) {
+      reply.code(400).send({
+        message: "Falha de validação",
+        errors: body.error.errors,
+      });
+      return;
+    }
 
     try {
-      const body = accountUpdateSchema.parse(request.body);
-      const updated = await accountUseCase.update(data.id, body);
-      if (!updated) return reply.code(404).send({ message: "Account not found" });
-      reply.send(updated);
+      const updatedAccount = await accountUseCase.update(params.id, body.data);
+      if (!updatedAccount)
+        return reply.code(404).send({ message: "Conta não encontrada" });
+      reply.send(updatedAccount);
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        return reply.code(400).send({ message: "Validation failed", errors: error.errors });
-      }
       reply.code(500).send({
-        message: error instanceof Error ? error.message : "Internal server error",
+        message: error instanceof Error ? error.message : "Erro inesperado",
       });
     }
   });
 
-  server.delete("/:id", async (request, reply) => {
-    const data = parseParams(paramsIdSchema, request.params, reply);
-    if (!data) return;
+  server.delete(
+    "/:id",
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const params = parseParams(paramsIdSchema, request.params, reply);
+      if (!params) return;
 
-    try {
-      const deleted = await accountUseCase.delete(data.id);
-      if (!deleted) return reply.code(404).send({ message: "Account not found" });
-      reply.code(204).send();
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        return reply.code(400).send({ message: "Validation failed", errors: error.errors });
+      try {
+        const deleted = await accountUseCase.delete(params.id);
+        if (!deleted)
+          return reply.code(404).send({ message: "Conta não encontrada" });
+        reply.code(204).send();
+      } catch (error) {
+        reply.code(500).send({
+          message: error instanceof Error ? error.message : "Erro inesperado",
+        });
       }
-      reply.code(500).send({
-        message: error instanceof Error ? error.message : "Internal server error",
-      });
     }
-  });
+  );
 }
 
 export default accountRoutes;

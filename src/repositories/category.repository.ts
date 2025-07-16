@@ -19,16 +19,17 @@ const categorySummarySelect = {
 };
 
 class CategoryRepository implements ICategoryRepository {
-  async findAll(): Promise<ICategorySummary[]> {
-    return await prisma.category.findMany({
-      select: categorySummarySelect,
-    });
-  }
-
   async findById(id: string): Promise<ICategory | null> {
     return await prisma.category.findUnique({
       where: { id },
       select: categorySelect,
+    });
+  }
+
+  async findByAccount(accountId: string): Promise<ICategorySummary[]> {
+    return await prisma.category.findMany({
+      where: { accountId },
+      select: categorySummarySelect,
     });
   }
 

@@ -40,13 +40,28 @@ class TransactionRepository implements ITransactionRepository {
   }
 
   async create(data: ITransactionCreatePayload): Promise<ITransaction> {
+    const increment =
+      data.transactionType === "INCOME" ? data.amount : -data.amount;
+
+    await prisma.account.update({
+      where: { id: data.accountId },
+      data: {
+        balance: {
+          increment,
+        },
+      },
+    });
+
     return await prisma.transaction.create({
       data,
       select: transactionSelect,
     });
   }
 
-  async update(id: string, data: ITransactionUpdatePayload): Promise<ITransaction> {
+  async update(
+    id: string,
+    data: ITransactionUpdatePayload
+  ): Promise<ITransaction> {
     return await prisma.transaction.update({
       where: { id },
       data,
