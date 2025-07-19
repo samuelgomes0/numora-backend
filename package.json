@@ -6,7 +6,10 @@
   "scripts": {
     "dev": "tsx watch src/app.ts",
     "build": "tsc -p .",
-    "start": "node build/app.js"
+    "start": "tsx build/app.js",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@prisma/client": "^6.11.1",
