@@ -27,29 +27,29 @@ class UserUseCase {
 
   async create(data: IUserCreatePayload): Promise<IUser> {
     const existing = await this.userRepository.findByEmail(data.email);
-    if (existing) {
-      throw new Error("E-mail já está em uso.");
-    }
+    if (existing) throw new Error("E-mail já está em uso.");
 
     return await this.userRepository.create(data);
   }
 
   async update(id: string, data: IUserUpdatePayload): Promise<IUser> {
-    const user = await this.userRepository.findById(id);
-    if (!user) {
-      throw new Error("Usuário não encontrado.");
-    }
+    await this.findAndValidateUser(id);
 
     return await this.userRepository.update(id, data);
   }
 
   async delete(id: string): Promise<IUser> {
-    const user = await this.userRepository.findById(id);
-    if (!user) {
-      throw new Error("Usuário não encontrado.");
-    }
+    await this.findAndValidateUser(id);
 
     return (await this.userRepository.delete(id)) as IUser;
+  }
+
+  private async findAndValidateUser(id: string): Promise<IUser> {
+    const user = await this.userRepository.findById(id);
+
+    if (!user) throw new Error("Usuário não encontrado.");
+
+    return user;
   }
 }
 

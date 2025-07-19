@@ -58,7 +58,7 @@ async function userRoutes(server: FastifyInstance) {
     if (!result.success) {
       reply.code(400).send({
         message: "Falha de validação",
-        errors: result.error.errors,
+        errors: result.error,
       });
       return;
     }
@@ -81,7 +81,7 @@ async function userRoutes(server: FastifyInstance) {
     if (!body.success) {
       reply.code(400).send({
         message: "Falha de validação",
-        errors: body.error.errors,
+        errors: body.error,
       });
       return;
     }

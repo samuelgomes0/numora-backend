@@ -2,6 +2,7 @@ interface IUser {
   id: string;
   name: string;
   email: string;
+  avatar: string | null;
   accounts?: IAccountSummary[];
 }
 
@@ -9,6 +10,7 @@ interface IUserSummary {
   id: string;
   name: string;
   email: string;
+  avatar: string | null;
 }
 
 interface IUserCreatePayload {
@@ -21,6 +23,7 @@ interface IUserUpdatePayload {
   name?: string;
   email?: string;
   password?: string;
+  avatar?: string | null;
 }
 
 interface IUserRepository {

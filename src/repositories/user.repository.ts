@@ -12,6 +12,7 @@ const userSummarySelect = {
   id: true,
   name: true,
   email: true,
+  avatar: true,
 };
 
 // Para detalhes do usuário - dados essenciais sem informações sensíveis
@@ -19,6 +20,8 @@ const userDetailSelect = {
   id: true,
   name: true,
   email: true,
+  avatar: true,
+  createdAt: true,
   accounts: {
     select: {
       id: true,
